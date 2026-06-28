@@ -1,0 +1,6613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>经营罗盘</title>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --panel: #ffffff;
+      --panel-soft: #f8fafc;
+      --line: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #335cff;
+      --primary-soft: #eef2ff;
+      --success: #059669;
+      --success-soft: #ecfdf3;
+      --warning: #d97706;
+      --warning-soft: #fff7ed;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg, #eef3ff 0%, #f7f9fc 18%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 248px 1fr;
+    }
+
+    .sidebar {
+      padding: 20px 18px;
+      background: #0f172a;
+      color: #f8fafc;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 6px;
+    }
+
+    .logo-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #4f7cff 0%, #335cff 100%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(51, 92, 255, 0.26);
+    }
+
+    .logo h1 {
+      margin: 0 0 2px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .logo p,
+    .side-note,
+    .nav-item span {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-item {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      color: #f8fafc;
+      border-radius: 14px;
+      padding: 14px 14px;
+      text-align: left;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .nav-item:hover {
+      transform: translateY(-1px);
+      border-color: rgba(148, 163, 184, 0.36);
+    }
+
+    .nav-item.active {
+      background: rgba(51, 92, 255, 0.2);
+      border-color: rgba(129, 140, 248, 0.72);
+    }
+
+    .nav-item strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .main {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .topbar,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar h2 {
+      margin: 0 0 6px;
+      font-size: 28px;
+    }
+
+    .topbar p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .chip.primary {
+      background: var(--primary-soft);
+      border-color: #c7d2fe;
+      color: var(--primary);
+    }
+
+    .primary-btn,
+    .ghost-btn,
+    .soft-btn,
+    .danger-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .primary-btn:hover,
+    .ghost-btn:hover,
+    .soft-btn:hover,
+    .danger-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 10px 18px rgba(51, 92, 255, 0.18);
+    }
+
+    .ghost-btn {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .soft-btn {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .danger-btn {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .embed-shell {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .embed-frame {
+      width: 100%;
+      height: calc(100vh - 40px);
+      min-height: 900px;
+      border: 0;
+      display: block;
+      background: #fff;
+    }
+
+    .metrics,
+    .grid-3,
+    .grid-2 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .metrics {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .metric-card,
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .metric-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric-value {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .metric-trend {
+      font-size: 13px;
+    }
+
+    .up {
+      color: var(--success);
+    }
+
+    .down {
+      color: var(--danger);
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .card-head h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .card-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .insight-card,
+    .task-card,
+    .package-card,
+    .timeline-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: var(--panel-soft);
+    }
+
+    .insight-card h4,
+    .task-card h4,
+    .package-card h4,
+    .timeline-card h4 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+
+    .insight-card p,
+    .task-card p,
+    .package-card p,
+    .timeline-card p,
+    .table td,
+    .table th {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .insight-top,
+    .package-top,
+    .task-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .tag.primary {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: #c7d2fe;
+    }
+
+    .tag.success {
+      background: var(--success-soft);
+      color: var(--success);
+      border-color: #b7ebc6;
+    }
+
+    .tag.neutral {
+      background: #f1f5f9;
+      color: #64748b;
+      border-color: #cbd5e1;
+    }
+
+    .tag.warning {
+      background: var(--warning-soft);
+      color: var(--warning);
+      border-color: #fed7aa;
+    }
+
+    .tag.danger {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+
+    .meta-row,
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .meta {
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .table-wrap {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+
+    .table th {
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .dot-success {
+      background: var(--success);
+    }
+
+    .dot-warning {
+      background: var(--warning);
+    }
+
+    .dot-danger {
+      background: var(--danger);
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .compare-box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: var(--panel-soft);
+    }
+
+    .compare-box h4 {
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+
+    .compare-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--line);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .compare-row strong {
+      color: var(--text);
+    }
+
+    .compare-row:last-child {
+      border-bottom: none;
+    }
+
+    .calendar-wrap {
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .calendar-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(116px, 1fr));
+      gap: 12px;
+      min-width: 1560px;
+    }
+
+    .month-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: var(--panel-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-height: 126px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .month-card.active {
+      background: var(--primary-soft);
+      border-color: #c7d2fe;
+    }
+
+    .month-card h4 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .month-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .month-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .trend-board {
+      display: grid;
+      grid-template-columns: 1fr;
+      margin-bottom: 16px;
+    }
+
+    .scope-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .trend-chart,
+    .define-block,
+    .plan-card,
+    .alert-block {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: var(--panel-soft);
+    }
+
+    .trend-chart {
+      overflow-x: auto;
+    }
+
+    .trend-chart svg {
+      width: 100%;
+      min-width: 1560px;
+      height: 262px;
+      display: block;
+    }
+
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend-line {
+      width: 24px;
+      height: 3px;
+      border-radius: 999px;
+    }
+
+    .legend-line.sales {
+      background: #335cff;
+    }
+
+    .legend-line.revenue {
+      background: #06b6d4;
+    }
+
+    .legend-line.week-actual {
+      background: #335cff;
+    }
+
+    .legend-line.week-target {
+      background: #94a3b8;
+    }
+
+    .summary-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .summary-card h4 {
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+
+    .summary-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .editable-summary {
+      margin: 0;
+      min-height: 0;
+      padding: 0;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      outline: none;
+    }
+
+    .editable-summary:empty {
+      display: none;
+    }
+
+    .editable-summary:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 0.88fr 1.52fr;
+      gap: 16px;
+    }
+
+    .plan-block,
+    .data-block,
+    .insight-block,
+    .overview-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: var(--panel-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .decision-grid,
+    .plan-grid,
+    .alert-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .decision-grid {
+      grid-template-columns: 1.15fr 1fr;
+    }
+
+    .plan-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .alert-grid {
+      grid-template-columns: 1.2fr 1fr;
+    }
+
+    .block-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .block-title h4 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .mini-kpis {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mini-kpi {
+      padding: 12px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .mini-kpi .name {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .mini-kpi .num {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .mini-kpi .sub {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .split-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .split-row {
+      display: grid;
+      grid-template-columns: 64px 1fr 44px;
+      align-items: center;
+      gap: 12px;
+      padding: 2px 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .split-row strong {
+      text-align: right;
+      color: #334155;
+      font-size: 13px;
+    }
+
+    .goal-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .goal-chip {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #475569;
+      font-size: 12px;
+    }
+
+    .target-metric-grid,
+    .actual-mix-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .target-metric-card {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .target-metric-card label,
+    .actual-mix-card .name {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .target-metric-card input {
+      width: 100%;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0 12px;
+      background: #fff;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .target-metric-card input[readonly] {
+      background: #f8fafc;
+      color: #334155;
+      cursor: default;
+    }
+
+    .actual-mix-card {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .actual-mix-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .actual-mix-top strong {
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .strategy-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .strategy-group-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .strategy-group {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .strategy-group-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .strategy-group-head h5 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .strategy-count {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .strategy-item {
+      padding: 10px 0 0;
+      margin-top: 10px;
+      border-top: 1px dashed var(--line);
+    }
+
+    .strategy-item:first-of-type {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .strategy-item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .strategy-item-head h6 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .strategy-item p,
+    .strategy-empty {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .strategy-empty {
+      padding: 6px 0 2px;
+    }
+
+    .strategy-line-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .strategy-line {
+      display: grid;
+      grid-template-columns: 72px 1fr auto;
+      gap: 10px;
+      align-items: start;
+      padding: 10px 0;
+      border-top: 1px dashed var(--line);
+      font-size: 13px;
+    }
+
+    .strategy-line:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .strategy-status {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .strategy-status.running {
+      color: var(--success);
+    }
+
+    .strategy-status.available {
+      color: var(--muted);
+    }
+
+    .strategy-name {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .strategy-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .strategy-desc {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .text-btn {
+      border: none;
+      background: transparent;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 2px 0 0;
+    }
+
+    .strategy-board {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .strategy-card {
+      border: 1px solid #e5ebf3;
+      border-radius: 14px;
+      background: #f8fafc;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .strategy-card-head h5 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .strategy-card-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .strategy-card-title-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .strategy-inline-desc {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .strategy-inline-desc::before {
+      content: "·";
+      margin-right: 8px;
+      color: #cbd5e1;
+    }
+
+    .section-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .strategy-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .strategy-info-block {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .strategy-info-block .name {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .strategy-info-block .value {
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .strategy-follow-toggle {
+      width: 100%;
+      border: 1px dashed #cbd5e1;
+      border-radius: 12px;
+      background: #fff;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .strategy-follow-toggle:hover {
+      background: #f8fbff;
+      border-color: #bfd3ff;
+    }
+
+    .toggle-meta {
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .strategy-follow-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) 260px;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .strategy-follow-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .strategy-follow-row {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 8px;
+      align-items: start;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .strategy-follow-week {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-top: 2px;
+    }
+
+    .strategy-follow-week strong {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .strategy-follow-week span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .strategy-week-action-input {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: #f8fafc;
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.5;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .strategy-follow-chart {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .strategy-follow-chart-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .strategy-follow-chart-title strong {
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .strategy-follow-chart svg {
+      width: 100%;
+      height: 110px;
+      display: block;
+    }
+
+    .strategy-follow-chart-hint {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .metric-fusion-card {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .overview-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .overview-main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.95fr);
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .overview-week-full {
+      grid-column: 1 / -1;
+    }
+
+    .overview-visual-col,
+    .overview-metric-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .metric-top-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .mix-combo-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mix-combo-card svg {
+      width: 100%;
+      height: 138px;
+      display: block;
+    }
+
+    .mix-combo-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mini-legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+      justify-content: flex-end;
+      margin-left: auto;
+    }
+
+    .mini-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mini-legend-bar,
+    .mini-legend-line {
+      display: inline-block;
+      width: 16px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    .mini-legend-bar {
+      background: #cdd8ff;
+    }
+
+    .mini-legend-line {
+      position: relative;
+      height: 2px;
+      background: #335cff;
+    }
+
+    .mini-legend-line::after {
+      content: "";
+      position: absolute;
+      right: -1px;
+      top: -3px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #335cff;
+    }
+
+    .metric-column-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .metric-column-card h5 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .metric-column-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .metric-column-list.two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      align-content: start;
+    }
+
+    .metric-column-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .metric-column-item .name {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+
+    .metric-column-item .value {
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .metric-column-item .note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .metric-column-item input.field {
+      height: 38px;
+      border-radius: 10px;
+      background: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 0 10px;
+    }
+
+    .metric-column-item input.field[readonly] {
+      background: #f8fafc;
+      color: var(--text);
+    }
+
+    .metric-compare-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric-compare-card {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .metric-compare-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .metric-compare-top .name {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric-compare-top .actual {
+      color: var(--text);
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .metric-compare-card .trend {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .metric-goal {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .metric-goal label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric-goal input {
+      width: 100%;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0 12px;
+      background: #f8fafc;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .metric-goal input:not([readonly]) {
+      background: #fff;
+    }
+
+    .mix-dual-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mix-panel {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mix-panel h5 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .mix-panel p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .strategy-layer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .strategy-group-compact {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .strategy-problem-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .strategy-problem-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .issue-order {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      padding: 0 8px;
+      border-radius: 999px;
+      border: 1px solid #c7d2fe;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .strategy-problem-head h5 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .strategy-core-metric {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .strategy-core-metric .meta {
+      background: #f8fafc;
+    }
+
+    .strategy-option-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .strategy-option {
+      border: 1px solid #dfe6ef;
+      border-radius: 12px;
+      background: #fbfcfe;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px auto;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .strategy-option:first-child {
+      padding-top: 10px;
+    }
+
+    .strategy-option-main {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .strategy-option-side {
+      padding-top: 26px;
+      align-self: stretch;
+    }
+
+    .strategy-problem-summary {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 6px;
+    }
+
+    .strategy-option-top {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .strategy-option-top strong {
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .strategy-brief-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .strategy-desc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .strategy-brief-item {
+      padding: 7px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .strategy-brief-item .name {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+
+    .strategy-brief-item .value {
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .strategy-chart-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 128px;
+    }
+
+    .strategy-chart-card .name {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .strategy-chart-card .hint {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .spark-legend {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .spark-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .spark-legend i {
+      width: 10px;
+      height: 2px;
+      display: inline-block;
+      border-radius: 999px;
+      background: #335cff;
+    }
+
+    .spark-legend i.alt {
+      background: #10b981;
+    }
+
+    .spark-placeholder {
+      height: 64px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 11px;
+      background: #fff;
+    }
+
+    .strategy-option .library-desc-item {
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+
+    .strategy-option .library-desc-item strong {
+      margin-bottom: 3px;
+      font-size: 12px;
+    }
+
+    .strategy-option .library-desc-item p {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .strategy-option .soft-link-btn {
+      white-space: nowrap;
+      align-self: flex-start;
+      margin-top: 26px;
+    }
+
+    .strategy-problem-summary {
+      display: none;
+    }
+
+    .issue-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .issue-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .issue-info-grid .library-desc-list {
+      margin: 0;
+    }
+
+    .issue-info-grid.single {
+      grid-template-columns: 1fr;
+    }
+
+    .issue-info-grid .library-desc-item {
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
+
+    .issue-info-grid .library-desc-item strong {
+      margin-bottom: 3px;
+      font-size: 12px;
+    }
+
+    .issue-info-grid .library-desc-item p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .execution-handoff-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .execution-handoff-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .execution-handoff-card h5 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .execution-handoff-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .execution-handoff-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .execution-handoff-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .issue-config-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .issue-config-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .issue-config-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .issue-config-head h4 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .issue-relation-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .issue-relation-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .issue-relation-item {
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 9px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .issue-config-card .metric-label {
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .issue-config-card .library-desc-item {
+      padding: 9px 10px;
+      border-radius: 10px;
+    }
+
+    .issue-config-card .library-desc-item strong {
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    .issue-config-card .library-desc-item p {
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .soft-link-btn {
+      border: 1px solid #dbe4ff;
+      background: #fff;
+      color: #335cff;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.2s ease;
+    }
+
+    .soft-link-btn:hover {
+      transform: translateY(-1px);
+      background: var(--primary-soft);
+    }
+
+    .issue-list,
+    .response-group-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .issue-card,
+    .response-group,
+    .asset-card,
+    .library-card,
+    .governance-card,
+    .phase-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 14px;
+    }
+
+    .issue-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .issue-card-head,
+    .response-group-head,
+    .library-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .issue-card-head h5,
+    .response-group-head h5,
+    .library-card-head h5,
+    .asset-card h5,
+    .governance-card h5,
+    .phase-card h5 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .issue-card p,
+    .response-group p,
+    .asset-card p,
+    .library-card p,
+    .governance-card p,
+    .phase-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .issue-meta-row,
+    .response-meta-grid,
+    .asset-grid,
+    .record-grid,
+    .phase-list,
+    .library-meta-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .issue-meta-row,
+    .response-meta-grid,
+    .record-grid,
+    .library-meta-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .asset-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .phase-list {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .issue-meta,
+    .response-meta,
+    .record-item,
+    .library-meta {
+      padding: 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+    }
+
+    .issue-meta .name,
+    .response-meta .name,
+    .record-item .name,
+    .library-meta .name {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .issue-meta .value,
+    .response-meta .value,
+    .record-item .value,
+    .library-meta .value {
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .response-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .response-card {
+      border-top: 1px dashed var(--line);
+      padding-top: 10px;
+    }
+
+    .response-card:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .response-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .response-title {
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .response-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .response-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .asset-card strong,
+    .library-card strong,
+    .phase-card strong {
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .asset-card .meta-row {
+      margin-top: 10px;
+    }
+
+    .library-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .library-filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      margin-bottom: 14px;
+    }
+
+    .library-filter-title {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .library-filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-chip-btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .filter-chip-btn.active {
+      background: var(--primary-soft);
+      border-color: #c7d2fe;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .library-grid {
+      display: grid;
+      grid-template-columns: 1.32fr 0.88fr;
+      gap: 16px;
+    }
+
+    .library-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .library-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .library-section-title {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .library-desc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .library-desc-item {
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .library-desc-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .phase-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #4f7cff 0%, #335cff 100%);
+    }
+
+    .drill-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .drill-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .week-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .week-chart-box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: #fff;
+      overflow-x: auto;
+    }
+
+    .week-chart-box svg {
+      width: 100%;
+      min-width: 880px;
+      height: 150px;
+      display: block;
+    }
+
+    .week-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .week-summary-card,
+    .week-column {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .week-summary-card h4 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .week-summary-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .week-column-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+
+    .week-column-head h4 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .week-date {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+
+    .week-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .week-kpi-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 10px;
+    }
+
+    .week-kpi-card .name {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .week-kpi-card .value {
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .week-kpi-card .value.bad,
+    .week-kpi-card .sub.bad {
+      color: #dc2626;
+    }
+
+    .week-kpi-card .value.good {
+      color: #4b7a64;
+    }
+
+    .week-kpi-card .sub {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .follow-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .follow-item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 10px;
+    }
+
+    .follow-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .follow-item-top strong {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .follow-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .opportunity-list,
+    .risk-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .opportunity-item,
+    .risk-item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .opportunity-item h5,
+    .risk-item-top h5 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .opportunity-item p,
+    .risk-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .risk-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .risk-group {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .risk-group-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .risk-group-head h5 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .risk-group-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .risk-group-item {
+      padding-top: 8px;
+      border-top: 1px dashed var(--line);
+    }
+
+    .risk-group-item:first-of-type {
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .risk-group-item strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .week-mini-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      padding-top: 4px;
+      border-top: 1px dashed var(--line);
+    }
+
+    .week-metric-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .week-metric-item {
+      display: grid;
+      grid-template-columns: 48px 1fr 92px;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--line);
+      font-size: 13px;
+    }
+
+    .week-metric-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .week-metric-item strong {
+      font-size: 14px;
+    }
+
+    .week-metric-item span {
+      color: var(--muted);
+    }
+
+    .monitor-grid {
+      display: grid;
+      grid-template-columns: 0.92fr 1.38fr;
+      gap: 16px;
+    }
+
+    .monitor-side {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .monitor-main {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .drill-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: var(--panel-soft);
+    }
+
+    .drill-item.active {
+      background: var(--primary-soft);
+      border-color: #c7d2fe;
+    }
+
+    .drill-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .drill-item h4 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .drill-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .alert-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .alert-item.clickable {
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .alert-item.clickable.active {
+      border-color: #c7d2fe;
+      background: var(--primary-soft);
+      box-shadow: inset 0 0 0 1px rgba(51, 92, 255, 0.08);
+    }
+
+    .alert-item h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+
+    .alert-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .drawer-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.32);
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.2s ease;
+    }
+
+    .drawer-mask.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 420px;
+      max-width: 100%;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -12px 0 30px rgba(15, 23, 42, 0.12);
+      transform: translateX(100%);
+      transition: 0.24s ease;
+      display: flex;
+      flex-direction: column;
+      z-index: 3;
+    }
+
+    .drawer.show {
+      transform: translateX(0);
+    }
+
+    .drawer-head,
+    .drawer-foot {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .drawer-foot {
+      border-bottom: none;
+      border-top: 1px solid var(--line);
+      margin-top: auto;
+    }
+
+    .drawer-head h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .drawer-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: auto;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      color: #334155;
+    }
+
+    .field,
+    .select {
+      width: 100%;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0 14px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .drawer-note {
+      padding: 14px;
+      border-radius: 12px;
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      min-width: 240px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: #111827;
+      color: #fff;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.28);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: 0.2s ease;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .console-month-grid {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .console-month-block {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      background: #fff;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .console-month-block h4 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .console-month-block p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .console-radar-box {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .console-radar-box svg {
+      width: 100%;
+      max-width: 460px;
+      height: 360px;
+      display: block;
+    }
+
+    .console-radar-legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: -2px;
+    }
+
+    .console-radar-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .console-radar-legend-line {
+      width: 18px;
+      height: 2px;
+      display: inline-block;
+      border-radius: 999px;
+    }
+
+    .console-radar-legend-line.current {
+      background: #335cff;
+    }
+
+    .console-radar-legend-line.last {
+      background: #94a3b8;
+    }
+
+    .console-situation-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .console-situation-card,
+    .console-summary-item,
+    .console-track-item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #f8fafc;
+      min-width: 0;
+    }
+
+    .console-situation-top,
+    .console-summary-top,
+    .console-track-top,
+    .console-store-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .console-situation-top strong,
+    .console-summary-top strong,
+    .console-track-top strong {
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .console-situation-trend {
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .console-summary-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.24fr) minmax(0, 0.96fr);
+      gap: 14px;
+    }
+
+    .console-summary-list,
+    .console-track-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .console-issue-button {
+      width: 100%;
+      text-align: left;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .console-issue-button:hover {
+      transform: translateY(-1px);
+      border-color: #d6dcff;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+    }
+
+    .console-issue-button.active {
+      background: linear-gradient(180deg, #f8fbff 0%, #f5f7ff 100%);
+      border-color: #c7d2fe;
+      box-shadow: inset 0 0 0 1px rgba(51, 92, 255, 0.08);
+    }
+
+    .console-issue-button .console-summary-top {
+      margin-bottom: 8px;
+    }
+
+    .console-problem-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .console-problem-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .console-problem-index {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: #e8edff;
+      color: #335cff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .console-problem-title strong {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .console-problem-context {
+      font-size: 13px;
+      line-height: 1.75;
+      color: #1f2937;
+    }
+
+    .console-problem-context b {
+      font-weight: 700;
+    }
+
+    .console-problem-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .console-problem-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #334155;
+    }
+
+    .console-problem-label {
+      min-width: 52px;
+      color: var(--muted);
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    .console-problem-value {
+      color: #111827;
+      font-size: 12px;
+    }
+
+    .console-problem-insight {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #dbe2ea;
+      color: #475569;
+      font-size: 12px;
+      line-height: 1.75;
+    }
+
+    .console-problem-metrics {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #dbe2ea;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .console-problem-metric {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .console-problem-metric strong {
+      display: block;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #64748b;
+      margin-bottom: 2px;
+      font-weight: 500;
+    }
+
+    .console-problem-metric > span {
+      display: block;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #15803d;
+      font-weight: 700;
+    }
+
+    .console-problem-metric-main {
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+      white-space: nowrap;
+    }
+
+    .console-problem-metric-main .metric-actual {
+      color: #15803d;
+      font-weight: 700;
+    }
+
+    .console-problem-metric-main .metric-target {
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .console-problem-metric small {
+      display: none;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #64748b;
+    }
+
+    .console-summary-main,
+    .console-track-main {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .console-summary-main strong,
+    .console-track-main strong {
+      font-size: 14px;
+    }
+
+    .console-mini-text {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .console-focus-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .console-focus-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .console-focus-card h5 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .console-kv-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .console-kv-item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .console-kv-item span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .console-kv-item strong {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .console-brief-box {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 16px;
+      background: linear-gradient(180deg, rgba(51, 92, 255, 0.06) 0%, rgba(255, 255, 255, 1) 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .console-brief-lead {
+      border-left: 4px solid #335cff;
+      padding-left: 12px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .console-brief-paragraph {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.9;
+      color: #111827;
+    }
+
+    .console-brief-negative {
+      display: inline-block;
+      padding: 0 2px;
+      border-radius: 6px;
+      background: rgba(51, 92, 255, 0.05);
+      color: #335cff;
+      font-weight: 600;
+    }
+
+    .console-brief-positive {
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .console-note-line {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .console-review-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .console-review-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .console-review-item span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .console-review-item strong {
+      font-size: 14px;
+      line-height: 1.8;
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .console-review-item.primary {
+      background: linear-gradient(180deg, rgba(51, 92, 255, 0.06) 0%, #fff 100%);
+      border-color: rgba(51, 92, 255, 0.2);
+    }
+
+    .console-strategy-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .console-strategy-scene {
+      font-size: 12px;
+      line-height: 1.7;
+      color: #475569;
+    }
+
+    .console-strategy-line {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .console-strategy-line span {
+      color: var(--muted);
+    }
+
+    .console-strategy-line strong {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #111827;
+      font-weight: 500;
+    }
+
+    .console-strategy-judgement {
+      font-size: 13px;
+      line-height: 1.8;
+      color: #334155;
+    }
+
+    .strategy-week-switch {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .strategy-week-button {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fff;
+      text-align: left;
+      cursor: pointer;
+      transition: 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 54px;
+    }
+
+    .strategy-week-button:hover {
+      border-color: #d6dcff;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+    }
+
+    .strategy-week-button.active {
+      background: linear-gradient(180deg, #f8fbff 0%, #f5f7ff 100%);
+      border-color: #c7d2fe;
+      box-shadow: inset 0 0 0 1px rgba(51, 92, 255, 0.08);
+    }
+
+    .strategy-week-button strong {
+      display: block;
+      font-size: 16px;
+      line-height: 1.2;
+      color: #111827;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .strategy-week-button span {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.4;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .strategy-week-detail {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fff;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .strategy-report-panel {
+      height: clamp(390px, 50vh, 560px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-gutter: stable;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    .strategy-report-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .strategy-report-panel::-webkit-scrollbar-track {
+      background: #eef2f7;
+      border-radius: 999px;
+    }
+
+    .strategy-report-panel::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+
+    .strategy-report-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .strategy-report-head h4 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.4;
+      color: #0f172a;
+    }
+
+    .strategy-report-meta {
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.7;
+      white-space: nowrap;
+    }
+
+    .strategy-report-body {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding-top: 16px;
+    }
+
+    .strategy-report-note {
+      color: #475569;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .strategy-report-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .strategy-report-section h5 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.5;
+      color: #111827;
+    }
+
+    .strategy-report-section p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.9;
+      color: #1f2937;
+    }
+
+    .strategy-report-list {
+      margin: 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      color: #1f2937;
+      font-size: 13px;
+      line-height: 1.85;
+    }
+
+    .strategy-report-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .strategy-report-table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .strategy-report-table th,
+    .strategy-report-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    .strategy-report-table th {
+      color: #475569;
+      background: #f8fafc;
+      font-weight: 600;
+    }
+
+    .strategy-report-table td {
+      color: #111827;
+    }
+
+    .strategy-report-table td:last-child,
+    .strategy-report-table th:last-child {
+      white-space: normal;
+    }
+
+    .strategy-report-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .strategy-period-summary {
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #f8fbff 0%, #f1f6ff 100%);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .strategy-period-summary-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .strategy-period-summary-head strong {
+      font-size: 13px;
+      color: #1d4ed8;
+    }
+
+    .strategy-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .strategy-summary-item {
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.82);
+      padding: 10px 12px;
+      min-width: 0;
+    }
+
+    .strategy-summary-item strong {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .strategy-summary-item p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .strategy-week-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .strategy-week-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 12px;
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      align-items: start;
+      gap: 10px;
+    }
+
+    .strategy-week-item.full {
+      background: linear-gradient(180deg, #f8fbff 0%, #f4f8ff 100%);
+      border-color: #d7e3ff;
+    }
+
+    .strategy-week-item strong {
+      font-size: 12px;
+      color: #64748b;
+      margin: 0;
+      line-height: 1.8;
+    }
+
+    .strategy-week-item p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.75;
+      color: #111827;
+    }
+
+    .strategy-highlight {
+      display: inline;
+      padding: 0 2px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .strategy-highlight.positive {
+      color: #15803d;
+      background: rgba(22, 163, 74, 0.08);
+    }
+
+    .strategy-highlight.warning {
+      color: #c2410c;
+      background: rgba(249, 115, 22, 0.10);
+    }
+
+    .strategy-highlight.neutral {
+      color: #1d4ed8;
+      background: rgba(59, 130, 246, 0.08);
+    }
+
+    .strategy-week-item p.tone-positive {
+      color: #15803d;
+      font-weight: 600;
+    }
+
+    .strategy-week-item p.tone-warning {
+      color: #c2410c;
+      font-weight: 600;
+    }
+
+    .strategy-week-item p.tone-neutral {
+      color: #111827;
+    }
+
+    .strategy-week-foot {
+      padding: 12px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px dashed #dbe2ea;
+      font-size: 12px;
+      line-height: 1.8;
+      color: #475569;
+    }
+
+    .strategy-month-review {
+      border: 1px solid #d7e3ff;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #f8fbff 0%, #f4f8ff 100%);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .strategy-month-review-head {
+      display: block;
+    }
+
+    .strategy-month-review-head strong {
+      display: block;
+      font-size: 15px;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .strategy-month-review-head p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #475569;
+    }
+
+    .strategy-month-review-copy {
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid #dbeafe;
+      font-size: 13px;
+      line-height: 1.8;
+      color: #111827;
+    }
+
+    .console-conclusion-line {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(51, 92, 255, 0.05);
+      border: 1px solid rgba(51, 92, 255, 0.12);
+      color: #334155;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .console-store-toolbar {
+      align-items: center;
+      margin-bottom: 14px;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #f8fafc;
+    }
+
+    .console-store-filters {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      width: 100%;
+    }
+
+    .console-filter-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .console-filter-item span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .console-filter-item .field,
+    .console-filter-item .select {
+      width: 100%;
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .console-brief-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .console-brief-foot .ghost-btn {
+      flex-shrink: 0;
+    }
+
+    .console-note-soft {
+      color: #94a3b8;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .table td .meta {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 1280px) {
+      .metrics,
+      .grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .decision-grid,
+      .plan-grid,
+      .monitor-grid,
+      .alert-grid,
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .week-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .strategy-summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .console-month-grid,
+      .console-summary-grid,
+      .console-situation-grid,
+      .console-kv-grid,
+      .strategy-week-grid,
+      .strategy-month-review-grid,
+      .strategy-week-switch {
+        grid-template-columns: 1fr;
+      }
+
+      .strategy-info-grid,
+      .overview-main-grid,
+      .strategy-follow-panel,
+      .metric-compare-grid,
+      .metric-top-grid,
+      .mix-dual-grid,
+      .issue-meta-row,
+      .response-meta-grid,
+      .asset-grid,
+      .record-grid,
+      .library-grid,
+      .library-list,
+      .library-meta-grid,
+      .phase-list,
+      .strategy-brief-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .metrics,
+      .grid-2,
+      .grid-3,
+      .compare-grid,
+      .week-summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .console-month-grid,
+      .console-summary-grid,
+      .console-situation-grid,
+      .console-kv-grid,
+      .strategy-week-grid,
+      .strategy-month-review-grid,
+      .strategy-week-switch {
+        grid-template-columns: 1fr;
+      }
+
+      .overview-main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .strategy-follow-row {
+        grid-template-columns: 1fr;
+      }
+
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-mark">盘</div>
+        <div>
+          <h1>经营罗盘</h1>
+        </div>
+      </div>
+      <nav class="nav" id="nav"></nav>
+    </aside>
+
+    <main class="main">
+      <section class="workspace" id="workspace"></section>
+    </main>
+  </div>
+
+  <div class="drawer-mask" id="drawerMask" onclick="closeDrawer()"></div>
+  <aside class="drawer" id="drawer">
+    <div class="drawer-head">
+      <div>
+        <h3 id="drawerTitle">执行实例配置</h3>
+      </div>
+      <button class="ghost-btn" onclick="closeDrawer()">关闭</button>
+    </div>
+    <div class="drawer-body">
+      <div class="form-group">
+        <label for="packageName">策略模板</label>
+        <input class="field" id="packageName" readonly>
+      </div>
+      <div class="form-group">
+        <label for="packageScope">执行范围</label>
+        <input class="field" id="packageScope" value="华东大区 23 家门店">
+      </div>
+      <div class="form-group">
+        <label for="packageCycle">生效周期</label>
+        <input class="field" id="packageCycle" value="2026-05-01 至 2026-05-14">
+      </div>
+      <div class="form-group">
+        <label for="packageOwner">主问题</label>
+        <select class="select" id="packageOwner">
+          <option selected>高峰价值流失</option>
+          <option>低谷时段空转</option>
+          <option>需求流失严重</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="packageLevel">参数版本</label>
+        <select class="select" id="packageLevel">
+          <option selected>默认参数版本</option>
+          <option>偏积极版本</option>
+          <option>偏保守版本</option>
+        </select>
+      </div>
+      <div class="drawer-note" id="drawerNote"></div>
+    </div>
+    <div class="drawer-foot">
+      <button class="ghost-btn" onclick="closeDrawer()">取消</button>
+      <button class="primary-btn" onclick="publishDrawer()">发布</button>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const packageMap = {
+      "高价值优先包": {
+        desc: "适合周末早场、节假日高峰和热门门店黄金时段，优先保护高价值承接。",
+        scope: "热门门店 18 家",
+        cycle: "2026-05-01 至 2026-05-14"
+      },
+      "低谷托底包": {
+        desc: "适合周间晚间和低预约门店，优先减少点位空转并稳住刚需底盘。",
+        scope: "华东大区 23 家门店",
+        cycle: "2026-05-01 至 2026-05-12"
+      },
+      "异常干预包": {
+        desc: "适合近 3 日预约明显低于常态的门店，用于快速发现、跟进和回收异常。",
+        scope: "异常门店 7 家",
+        cycle: "即时生效"
+      },
+      "高峰扩供包": {
+        desc: "适合证件、功能等高峰需求上升月份，对重点门店晚间时段做增开和增援配置。",
+        scope: "CBD 商圈门店 23 家",
+        cycle: "2026-07-01 至 2026-07-31"
+      },
+      "证件放量包": {
+        desc: "适合证件需求高峰期，关闭限流并优先承接自然流量。",
+        scope: "证件需求重点门店 31 家",
+        cycle: "2026-07-01 至 2026-07-31"
+      },
+      "周度调控包": {
+        desc: "适合总部基于周数据做方向性记录和门店任务下发。",
+        scope: "第 3 周目标门店 12 家",
+        cycle: "2026-07-15 至 2026-07-21"
+      },
+      "预警干预包": {
+        desc: "适合重点监控条件触发后的门店预警下发和人工跟进。",
+        scope: "触发门店 9 家",
+        cycle: "即时生效"
+      }
+    };
+
+    const monthData = {
+      1: {
+        yearLabel: "2026年1月",
+        tagClass: "warning",
+        tag: "大单主导",
+        salesIndex: "0.776",
+        revenueIndex: "1.092",
+        events: ["元旦", "寒假预热"],
+        focusTitle: "1 月大单主导，优先保高价值承接",
+        focusDesc: "家庭、好友、情侣需求集中，核心任务是稳住高价值履约质量，而不是盲目补量。",
+        focusTags: ["家庭/好友/情侣偏好", "业绩指数 1.092"],
+        mix: [["证件", 12], ["功能", 14], ["写真", 32], ["复杂写真", 42]],
+        staffing: { days: 118, stores: 16, note: "预计需出勤 382 人，重点保障节假日高峰和大单履约稳定性。" },
+        metrics: {
+          revenue: "￥1,728万", revenueTrend: "同比 +6.4% / 环比 +12.2%",
+          point: "￥344", pointTrend: "同比 +4.1% / 环比 +6.3%",
+          aov: "￥1,248", aovTrend: "同比 +8.7% / 环比 +9.1%",
+          orders: "13,846", ordersTrend: "同比 +2.9% / 环比 +7.5%",
+          health: "84 分", healthNote: "大单承接门店 14 家，节假日高峰门店 16 家。",
+          week: "节假日前后为核心承接周，优先稳住家庭和好友场景的排班与产能。",
+          resource: "兼职补位集中在元旦和寒假前首周。"
+        },
+        strategies: [
+          { title: "高价值优先承接", label: "高价值优先", desc: "节假日早场优先开放家庭、好友、情侣等高价值场景。", pkg: "高价值优先包" },
+          { title: "节假日重点保供", label: "节假日保供", desc: "重点门店保留大点位与核心班次，避免高峰时段履约失稳。", pkg: "高峰扩供包" }
+        ],
+        weekFocusLabel: "当前焦点：节假日前后",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "success", tag: "重点承接周", desc: "元旦与寒假预热叠加，优先保家庭、好友场景承接。", action: "下发周度任务", pkg: "周度调控包", active: true },
+          { title: "第 2 周", tagClass: "primary", tag: "平稳承接", desc: "关注节后回落，逐步回收过量供给。" },
+          { title: "第 3 周", tagClass: "warning", tag: "结构观察", desc: "监控高价值场景转化是否开始回落。" },
+          { title: "第 4 周", tagClass: "primary", tag: "准备切月", desc: "开始评估 2 月需求走弱下的托底策略。" }
+        ],
+        storeRows: [
+          { store: "上海环球港店", status: "执行中", assist: "兼职 4 人天", action: "高价值场景优先开放", pkg: "高价值优先包", type: "soft" },
+          { store: "杭州滨江店", status: "待执行", assist: "兼职 3 人天", action: "节假日重点保供", pkg: "高峰扩供包", type: "soft" },
+          { store: "武汉群光店", status: "待反馈", assist: "暂缓增援", action: "确认节后回落原因", pkg: "异常干预包", type: "danger" }
+        ],
+        alerts: [
+          { title: "节假日高峰时段预约率持续高位", desc: "触发门店 10 家，集中在华东核心商圈。", tag: "已触发", tagClass: "warning" },
+          { title: "大单履约排班低于需求", desc: "触发门店 6 家，需优先锁定高价值班次。", tag: "需处理", tagClass: "danger" },
+          { title: "节后高价值转化回落", desc: "触发门店 5 家，需尽快调整高峰保供强度。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "节假日重点门店 16 家，结构观察门店 5 家，共 21 家门店。"
+      },
+      2: {
+        yearLabel: "2026年2月",
+        tagClass: "danger",
+        tag: "增长乏力",
+        salesIndex: "0.783",
+        revenueIndex: "0.823",
+        events: ["春节", "谷底"],
+        focusTitle: "2 月增长乏力，优先托底而非激进扩供",
+        focusDesc: "节后需求恢复慢，先稳住刚需和基础效率，避免高成本扩供。",
+        focusTags: ["业绩谷底", "节后恢复慢"],
+        mix: [["证件", 18], ["功能", 20], ["写真", 34], ["复杂写真", 28]],
+        staffing: { days: 86, stores: 11, note: "预计需出勤 318 人，重点控制空转和低效排班。" },
+        metrics: {
+          revenue: "￥1,206万", revenueTrend: "同比 -8.4% / 环比 -15.7%",
+          point: "￥286", pointTrend: "同比 -7.3% / 环比 -11.8%",
+          aov: "￥1,032", aovTrend: "同比 -4.1% / 环比 -9.7%",
+          orders: "11,688", ordersTrend: "同比 -5.2% / 环比 -13.4%",
+          health: "71 分", healthNote: "空转门店 18 家，异常门店 6 家。",
+          week: "节后第 2 周到第 3 周是恢复关键期，先保刚需承接和效率盘。",
+          resource: "兼职补位收缩，重点转向低谷托底。"
+        },
+        strategies: [
+          { title: "低谷托底", label: "低谷托底", desc: "优先开放证件、职场等刚需场景，减少低谷空转。", pkg: "低谷托底包" },
+          { title: "异常回收", label: "异常干预", desc: "对持续低于常态门店先做异常确认，再决定是否继续投放。", pkg: "异常干预包" }
+        ],
+        weekFocusLabel: "当前焦点：节后恢复周",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "warning", tag: "低位运行", desc: "先观察春节后恢复节奏，不做激进扩供。" },
+          { title: "第 2 周", tagClass: "success", tag: "重点托底周", desc: "用证件、职场等刚需场景稳住底盘。", action: "下发周度任务", pkg: "周度调控包", active: true },
+          { title: "第 3 周", tagClass: "primary", tag: "效率观察", desc: "重点看晚间和周中空转情况。" },
+          { title: "第 4 周", tagClass: "primary", tag: "准备切月", desc: "开始评估 3 月结构变化和场景切换。" }
+        ],
+        storeRows: [
+          { store: "南京新街口店", status: "待执行", assist: "兼职 2 人天", action: "开放证件托底", pkg: "低谷托底包", type: "soft" },
+          { store: "武汉群光店", status: "待反馈", assist: "暂停增援", action: "确认异常原因", pkg: "异常干预包", type: "danger" },
+          { store: "苏州中心店", status: "执行中", assist: "兼职 1 人天", action: "收缩低效时段", pkg: "低谷托底包", type: "soft" }
+        ],
+        alerts: [
+          { title: "周中空闲点位损失率偏高", desc: "触发门店 14 家，集中在华中与华东。", tag: "已触发", tagClass: "warning" },
+          { title: "异常门店连续低于常态", desc: "触发门店 6 家，需要快速确认原因。", tag: "需处理", tagClass: "danger" },
+          { title: "刚需承接不足", desc: "触发门店 8 家，需调整场景优先级。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "低谷观察门店 14 家，异常门店 6 家，共 20 家门店。"
+      },
+      3: {
+        yearLabel: "2026年3月",
+        tagClass: "warning",
+        tag: "结构降级",
+        salesIndex: "0.929",
+        revenueIndex: "0.846",
+        events: ["春招"],
+        focusTitle: "3 月结构降级，优先修复高价值转化",
+        focusDesc: "职场、儿童、证件占比走高，需关注高价值承接是否被低价值结构挤压。",
+        focusTags: ["职场偏好", "业绩承压"],
+        mix: [["证件", 24], ["功能", 18], ["写真", 33], ["复杂写真", 25]],
+        staffing: { days: 102, stores: 13, note: "预计需出勤 336 人，重点平衡周中刚需与周末价值盘。" },
+        metrics: {
+          revenue: "￥1,284万", revenueTrend: "同比 -5.6% / 环比 +6.5%",
+          point: "￥298", pointTrend: "同比 -3.8% / 环比 +4.2%",
+          aov: "￥1,018", aovTrend: "同比 -6.1% / 环比 -1.4%",
+          orders: "12,614", ordersTrend: "同比 +3.1% / 环比 +7.9%",
+          health: "74 分", healthNote: "结构偏弱门店 15 家，需重点观察。", 
+          week: "周中职场需求明显，周末高价值承接偏弱。",
+          resource: "兼职补位以周中晚间为主。"
+        },
+        strategies: [
+          { title: "高价值修复", label: "结构修复", desc: "优先保障周末高价值场景承接，避免低价值抢位。", pkg: "高价值优先包" },
+          { title: "周中效率托底", label: "效率托底", desc: "周中优先承接职场与证件，稳住基础盘。", pkg: "低谷托底包" }
+        ],
+        weekFocusLabel: "当前焦点：结构修复周",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "primary", tag: "需求回升", desc: "重点观察春招带来的职场需求。"},
+          { title: "第 2 周", tagClass: "warning", tag: "结构偏弱", desc: "高价值承接仍未恢复，需收紧低价值抢位。"},
+          { title: "第 3 周", tagClass: "success", tag: "重点修复周", desc: "优先保障周末高价值时段。", action: "下发周度任务", pkg: "周度调控包", active: true },
+          { title: "第 4 周", tagClass: "primary", tag: "准备切月", desc: "为 4 月增长乏力月做托底准备。"}
+        ],
+        storeRows: [
+          { store: "上海环球港店", status: "待执行", assist: "兼职 3 人天", action: "周末高价值优先开放", pkg: "高价值优先包", type: "soft" },
+          { store: "杭州滨江店", status: "执行中", assist: "兼职 2 人天", action: "周中证件托底", pkg: "低谷托底包", type: "soft" },
+          { store: "武汉群光店", status: "待反馈", assist: "暂缓增援", action: "确认结构偏弱原因", pkg: "异常干预包", type: "danger" }
+        ],
+        alerts: [
+          { title: "高价值转化差值继续走弱", desc: "触发门店 11 家，需优先做结构修复。", tag: "已触发", tagClass: "warning" },
+          { title: "周末高价值承接不足", desc: "触发门店 8 家，集中在核心商圈门店。", tag: "需处理", tagClass: "danger" },
+          { title: "周中点位利用偏低", desc: "触发门店 7 家，可用刚需场景托底。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "结构修复门店 11 家，周中托底门店 7 家，共 18 家门店。"
+      },
+      4: {
+        yearLabel: "2026年4月",
+        tagClass: "danger",
+        tag: "增长乏力",
+        salesIndex: "0.917",
+        revenueIndex: "0.866",
+        events: ["清明"],
+        focusTitle: "4 月增长乏力，先稳效率再修结构",
+        focusDesc: "总量偏弱且高价值承接不足，当前更适合先稳住效率盘，再逐步修复结构。",
+        focusTags: ["增长乏力", "效率优先"],
+        mix: [["证件", 22], ["功能", 18], ["写真", 36], ["复杂写真", 24]],
+        staffing: { days: 96, stores: 12, note: "预计需出勤 324 人，优先压缩低效供给，保留有效承接。"},
+        metrics: {
+          revenue: "￥1,268万", revenueTrend: "同比 -4.2% / 环比 -1.8%",
+          point: "￥328", pointTrend: "同比 +2.8% / 环比 +1.6%",
+          aov: "￥1,124", aovTrend: "同比 -3.1% / 环比 -1.2%",
+          orders: "11,442", ordersTrend: "同比 +1.6% / 环比 -2.4%",
+          health: "76 分", healthNote: "效率偏弱门店 12 家，异常门店 5 家。",
+          week: "周中晚间和周日是效率盘重点，先保点位利用率。",
+          resource: "兼职补位收紧，优先投向高效门店。"
+        },
+        strategies: [
+          { title: "低谷托底", label: "低谷托底", desc: "周中晚间优先开放刚需场景，减少点位空转。", pkg: "低谷托底包" },
+          { title: "异常回收", label: "异常干预", desc: "对连续低于常态门店先排查，再决定是否继续投放。", pkg: "异常干预包" }
+        ],
+        weekFocusLabel: "当前焦点：效率盘",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "primary", tag: "平稳观察", desc: "先看清明后恢复节奏。"},
+          { title: "第 2 周", tagClass: "warning", tag: "周中偏弱", desc: "周中晚间点位利用偏低，需托底。 "},
+          { title: "第 3 周", tagClass: "success", tag: "重点托底周", desc: "优先处理周间晚间与异常门店。", action: "下发周度任务", pkg: "周度调控包", active: true },
+          { title: "第 4 周", tagClass: "primary", tag: "准备切月", desc: "开始为 5 月结构降级月做周末价值承接准备。"}
+        ],
+        storeRows: [
+          { store: "杭州滨江店", status: "待执行", assist: "兼职 2 人天", action: "周间晚间增开 6 点位", pkg: "低谷托底包", type: "soft" },
+          { store: "上海环球港店", status: "执行中", assist: "兼职 1 人天", action: "保留高效时段", pkg: "低谷托底包", type: "soft" },
+          { store: "武汉群光店", status: "待反馈", assist: "暂停增援", action: "确认异常原因", pkg: "异常干预包", type: "danger" }
+        ],
+        alerts: [
+          { title: "周中晚间空转损失率偏高", desc: "触发门店 12 家，集中在华东与华中。", tag: "已触发", tagClass: "warning" },
+          { title: "异常门店连续下滑", desc: "触发门店 5 家，需要区域快速反馈。", tag: "需处理", tagClass: "danger" },
+          { title: "高价值承接不足", desc: "触发门店 7 家，可提前做结构修复。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "效率观察门店 12 家，异常门店 5 家，共 17 家门店。"
+      },
+      5: {
+        yearLabel: "2026年5月",
+        tagClass: "warning",
+        tag: "结构降级",
+        salesIndex: "1.007",
+        revenueIndex: "0.941",
+        events: ["五一"],
+        focusTitle: "5 月结构降级，重点提升周末价值承接",
+        focusDesc: "销量平稳但业绩偏弱，需防止低价值场景挤占黄金时段。",
+        focusTags: ["备婚抬升", "价值承接偏弱"],
+        mix: [["证件", 20], ["功能", 15], ["写真", 35], ["复杂写真", 30]],
+        staffing: { days: 112, stores: 14, note: "预计需出勤 348 人，优先保障五一与周末高价值时段。"},
+        metrics: {
+          revenue: "￥1,396万", revenueTrend: "同比 -1.9% / 环比 +6.3%",
+          point: "￥332", pointTrend: "同比 +1.5% / 环比 +1.2%",
+          aov: "￥1,076", aovTrend: "同比 -4.7% / 环比 -2.6%",
+          orders: "13,214", ordersTrend: "同比 +5.8% / 环比 +7.1%",
+          health: "78 分", healthNote: "高价值承接弱门店 10 家，需重点分层。",
+          week: "节假日后周末是价值盘关键，需要优先保周末早场。",
+          resource: "兼职补位集中在五一和周末高峰。"
+        },
+        strategies: [
+          { title: "高价值优先", label: "高价值优先", desc: "周末黄金时段优先开放备婚、家庭、多人写真。", pkg: "高价值优先包" },
+          { title: "节后效率托底", label: "效率托底", desc: "节后周间优先承接职场、证件，稳住基础盘。", pkg: "低谷托底包" }
+        ],
+        weekFocusLabel: "当前焦点：周末价值盘",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "success", tag: "节假日高峰", desc: "优先保障五一高价值时段。 "},
+          { title: "第 2 周", tagClass: "warning", tag: "结构偏弱", desc: "高峰回落后需防低价值抢位。 ", active: true, action: "下发周度任务", pkg: "周度调控包" },
+          { title: "第 3 周", tagClass: "primary", tag: "周中托底", desc: "用刚需场景稳住周中效率。 "},
+          { title: "第 4 周", tagClass: "primary", tag: "准备切月", desc: "为 6 月证件升温做资源准备。"}
+        ],
+        storeRows: [
+          { store: "上海环球港店", status: "执行中", assist: "兼职 5 人天", action: "周末高价值优先", pkg: "高价值优先包", type: "soft" },
+          { store: "杭州滨江店", status: "待执行", assist: "兼职 2 人天", action: "节后周间效率托底", pkg: "低谷托底包", type: "soft" },
+          { store: "苏州中心店", status: "待反馈", assist: "暂缓增援", action: "确认价值承接弱原因", pkg: "异常干预包", type: "danger" }
+        ],
+        alerts: [
+          { title: "周末黄金时段被低价值占用", desc: "触发门店 9 家，需重点限流。", tag: "已触发", tagClass: "warning" },
+          { title: "高价值承接率偏低", desc: "触发门店 10 家，需结构修复。", tag: "需处理", tagClass: "danger" },
+          { title: "节后周中利用率偏弱", desc: "触发门店 6 家，可适度托底。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "价值修复门店 10 家，周中托底门店 6 家，共 16 家门店。"
+      },
+      6: {
+        yearLabel: "2026年6月",
+        tagClass: "warning",
+        tag: "结构降级",
+        salesIndex: "1.098",
+        revenueIndex: "0.965",
+        events: ["毕业季", "升温"],
+        focusTitle: "6 月证件升温，提前为暑期高峰备供",
+        focusDesc: "销量先抬升但业绩未同步，说明证件需求升温，需要提前准备暑期承接资源。",
+        focusTags: ["证件偏好 1.17x", "暑期前置期"],
+        mix: [["证件", 30], ["功能", 16], ["写真", 31], ["复杂写真", 23]],
+        staffing: { days: 136, stores: 19, note: "预计需出勤 396 人，开始准备暑期重点门店的增援与排班。"},
+        metrics: {
+          revenue: "￥1,542万", revenueTrend: "同比 +3.8% / 环比 +7.4%",
+          point: "￥341", pointTrend: "同比 +2.4% / 环比 +2.7%",
+          aov: "￥1,048", aovTrend: "同比 -1.2% / 环比 -2.6%",
+          orders: "14,706", ordersTrend: "同比 +10.7% / 环比 +8.3%",
+          health: "80 分", healthNote: "暑期准备门店 19 家，晚间承接压力上升。",
+          week: "第 2 周开始进入证件升温期，优先观察重点商圈晚间需求。",
+          resource: "兼职补位提前锁定，为 7-8 月高峰做准备。"
+        },
+        strategies: [
+          { title: "高峰预备扩供", label: "高峰预备", desc: "重点商圈提前释放晚间点位，做暑期承接测试。", pkg: "高峰扩供包" },
+          { title: "证件放量预热", label: "证件预热", desc: "逐步放宽证件限制，观察自然需求抬升速度。", pkg: "证件放量包" }
+        ],
+        weekFocusLabel: "当前焦点：升温观察周",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "primary", tag: "平稳承接", desc: "观察毕业季开始后的需求变化。" },
+          { title: "第 2 周", tagClass: "success", tag: "升温观察周", desc: "重点看证件需求是否持续上升。", action: "下发周度任务", pkg: "周度调控包", active: true },
+          { title: "第 3 周", tagClass: "warning", tag: "供给准备", desc: "筛选 7 月需重点扩供门店。" },
+          { title: "第 4 周", tagClass: "primary", tag: "准备切月", desc: "锁定 7 月重点商圈门店和资源。"}
+        ],
+        storeRows: [
+          { store: "上海环球港店", status: "待执行", assist: "兼职 4 人天", action: "晚间点位预备增开", pkg: "高峰扩供包", type: "soft" },
+          { store: "杭州滨江店", status: "执行中", assist: "兼职 3 人天", action: "逐步放开证件限制", pkg: "证件放量包", type: "soft" },
+          { store: "深圳万象店", status: "待反馈", assist: "暂缓增援", action: "确认晚间承接边界", pkg: "异常干预包", type: "danger" }
+        ],
+        alerts: [
+          { title: "重点商圈晚间需求开始抬升", desc: "触发门店 15 家，需提前做好增援准备。", tag: "已触发", tagClass: "warning" },
+          { title: "证件预约率上行明显", desc: "触发门店 18 家，可逐步放开限制。", tag: "需处理", tagClass: "danger" },
+          { title: "暑期前置排班不足", desc: "触发门店 8 家，需提前锁定兼职。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "升温观察门店 18 家，排班预备门店 8 家，共 26 家门店。"
+      },
+      7: {
+        yearLabel: "2026年7月",
+        tagClass: "success",
+        tag: "量价齐升",
+        salesIndex: "1.164",
+        revenueIndex: "1.058",
+        events: ["暑期", "证件高峰"],
+        focusTitle: "",
+        focusDesc: "",
+        focusTags: ["证件需求集中", "CBD 商圈优先"],
+        mix: [["证件", 34], ["功能", 16], ["写真", 29], ["复杂写真", 21]],
+        staffing: { days: 162, stores: 26, note: "预计需出勤 438 人，重点为暑期高峰和晚间承接补位。"},
+        metrics: {
+          revenue: "￥1,862万", revenueTrend: "同比 +12.6% / 环比 +8.4%",
+          point: "￥356", pointTrend: "同比 +6.2% / 环比 +4.1%",
+          aov: "￥1,086", aovTrend: "同比 -2.1% / 环比 -1.3%",
+          orders: "17,146", ordersTrend: "同比 +14.9% / 环比 +9.8%",
+          health: "82 分", healthNote: "高峰承接门店 18 家，需增援门店 23 家，异常门店 7 家，预警门店 9 家。",
+          week: "第 3 周为重点干预周，CBD 商圈晚间承接偏紧，优先筛选 12 家目标门店进入周度调控池。",
+          resource: "预计需出勤 438 人，扣除全职可排 276 人后，兼职补位 162 人天，重点投向第 2 至第 4 周。"
+        },
+        strategies: [
+          { title: "推荐策略 1", label: "高峰扩供", desc: "CBD 商圈门店增开 1 排晚间点位，时段为 18:00-20:00。", pkg: "高峰扩供包" },
+          { title: "推荐策略 2", label: "限流放开", desc: "关闭 7 月所有证件限流，优先保证证件高峰期自然承接。", pkg: "证件放量包" }
+        ],
+        weekFocusLabel: "当前焦点：第 3 周",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "primary", tag: "平稳承接", desc: "高峰刚起，重点看证件需求是否按预期放量。"},
+          { title: "第 2 周", tagClass: "warning", tag: "供给偏紧", desc: "晚间供给开始吃紧，需提前准备 CBD 商圈门店增援。"},
+          { title: "第 3 周", tagClass: "success", tag: "重点干预周", desc: "证件高峰最强，建议先下发方向记录，再对目标门店发布周度任务。", action: "下发周度任务", pkg: "周度调控包", active: true },
+          { title: "第 4 周", tagClass: "primary", tag: "持续观察", desc: "关注扩供后履约压力与高峰回落速度，避免过量投放。"}
+        ],
+        storeRows: [
+          { store: "上海环球港店", status: "执行中", assist: "兼职 6 人天", action: "晚间增开 1 排点位", pkg: "高峰扩供包", type: "soft" },
+          { store: "杭州滨江店", status: "待执行", assist: "兼职 4 人天", action: "关闭证件限流", pkg: "证件放量包", type: "soft" },
+          { store: "武汉群光店", status: "待反馈", assist: "暂缓增援", action: "先完成异常确认", pkg: "异常干预包", type: "danger" }
+        ],
+        alerts: [
+          { title: "晚间预约率持续高于 0.68", desc: "触发门店 12 家，主要集中在华东 CBD 商圈。", tag: "已触发", tagClass: "warning" },
+          { title: "需兼职增援但全职排班不足", desc: "触发门店 9 家，集中在上海、杭州、深圳。", tag: "需处理", tagClass: "danger" },
+          { title: "异常门店连续 3 日低于常态", desc: "触发门店 7 家，集中在武汉、南京。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "华东 CBD 商圈 12 家，异常观察池 7 家，共 19 家门店。"
+      },
+      8: {
+        yearLabel: "2026年8月",
+        tagClass: "success",
+        tag: "量价齐升",
+        salesIndex: "1.471",
+        revenueIndex: "1.199",
+        events: ["暑期峰值"],
+        focusTitle: "8 月暑期峰值，核心是保供放量",
+        focusDesc: "销量和业绩同时达到峰值，当前最重要的是保证高峰供给稳定承接。",
+        focusTags: ["销量峰值", "保供优先"],
+        mix: [["证件", 32], ["功能", 15], ["写真", 31], ["复杂写真", 22]],
+        staffing: { days: 188, stores: 31, note: "预计需出勤 462 人，重点保障暑期峰值阶段全量供给稳定。" },
+        metrics: {
+          revenue: "￥2,046万", revenueTrend: "同比 +18.2% / 环比 +9.9%",
+          point: "￥368", pointTrend: "同比 +8.1% / 环比 +3.4%",
+          aov: "￥1,094", aovTrend: "同比 +0.8% / 环比 +0.7%",
+          orders: "18,704", ordersTrend: "同比 +17.6% / 环比 +9.1%",
+          health: "85 分", healthNote: "暑期峰值门店 31 家，重点保供门店 22 家。",
+          week: "第 2 周到第 3 周是峰值最高区间，优先保供放量。",
+          resource: "兼职补位与跨店支援均达到高位。"
+        },
+        strategies: [
+          { title: "峰值保供", label: "高峰扩供", desc: "重点门店全量保供，优先扩充高峰时段开放点位。", pkg: "高峰扩供包" },
+          { title: "限制回收", label: "证件放量", desc: "证件限制继续保持关闭，优先吃满自然需求。", pkg: "证件放量包" }
+        ],
+        weekFocusLabel: "当前焦点：峰值最高周",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "primary", tag: "高位运行", desc: "保持高峰承接节奏。"},
+          { title: "第 2 周", tagClass: "success", tag: "峰值最高周", desc: "优先保供放量，不做结构收缩。", action: "下发周度任务", pkg: "周度调控包", active: true },
+          { title: "第 3 周", tagClass: "warning", tag: "履约观察", desc: "关注连续高峰带来的履约压力。"},
+          { title: "第 4 周", tagClass: "primary", tag: "准备回落", desc: "开始评估 9 月回落节奏。"}
+        ],
+        storeRows: [
+          { store: "上海环球港店", status: "执行中", assist: "兼职 8 人天", action: "全量保供高峰时段", pkg: "高峰扩供包", type: "soft" },
+          { store: "杭州滨江店", status: "执行中", assist: "兼职 6 人天", action: "继续保持证件放量", pkg: "证件放量包", type: "soft" },
+          { store: "深圳万象店", status: "待反馈", assist: "兼职 5 人天", action: "确认履约上限", pkg: "异常干预包", type: "danger" }
+        ],
+        alerts: [
+          { title: "重点时段预约率持续满载", desc: "触发门店 18 家，需要持续保供。", tag: "已触发", tagClass: "warning" },
+          { title: "履约超负荷风险抬升", desc: "触发门店 9 家，需重点看排班极限。", tag: "需处理", tagClass: "danger" },
+          { title: "晚间回落速度放缓", desc: "触发门店 7 家，需谨慎回收供给。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "高峰保供门店 18 家，履约观察门店 9 家，共 27 家门店。"
+      },
+      9: {
+        yearLabel: "2026年9月",
+        tagClass: "warning",
+        tag: "结构降级",
+        salesIndex: "1.104",
+        revenueIndex: "0.993",
+        events: ["开学季"],
+        focusTitle: "9 月回落转结构，重点避免高峰后错配",
+        focusDesc: "销量仍高但业绩趋稳，重点从放量切回结构和效率管理。",
+        focusTags: ["开学季", "回落转结构"],
+        mix: [["证件", 26], ["功能", 16], ["写真", 34], ["复杂写真", 24]],
+        staffing: { days: 132, stores: 17, note: "预计需出勤 388 人，重点回收过量供给并修复结构。" },
+        metrics: {
+          revenue: "￥1,688万", revenueTrend: "同比 +4.3% / 环比 -11.6%",
+          point: "￥334", pointTrend: "同比 +1.2% / 环比 -9.2%",
+          aov: "￥1,024", aovTrend: "同比 -3.5% / 环比 -6.4%",
+          orders: "16,488", ordersTrend: "同比 +3.8% / 环比 -11.9%",
+          health: "79 分", healthNote: "结构偏弱门店 13 家，需回收暑期过量供给。",
+          week: "开学后首两周是供给回收与结构修复关键期。",
+          resource: "兼职补位逐步回收，重点转向结构修复。"
+        },
+        strategies: [
+          { title: "供给回收", label: "效率修复", desc: "回收暑期过量供给，恢复常态时段配置。", pkg: "低谷托底包" },
+          { title: "结构修复", label: "高价值优先", desc: "重点时段重新提高高价值场景承接优先级。", pkg: "高价值优先包" }
+        ],
+        weekFocusLabel: "当前焦点：回落修复周",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "success", tag: "回落修复周", desc: "优先回收过量供给，恢复常态时段。", action: "下发周度任务", pkg: "周度调控包", active: true },
+          { title: "第 2 周", tagClass: "warning", tag: "结构修复", desc: "重建高价值承接优先级。"},
+          { title: "第 3 周", tagClass: "primary", tag: "平稳运行", desc: "观察回收后效率是否稳定。"},
+          { title: "第 4 周", tagClass: "primary", tag: "准备切月", desc: "进入常规平稳月。"}
+        ],
+        storeRows: [
+          { store: "上海环球港店", status: "待执行", assist: "回收 3 人天", action: "回收暑期过量供给", pkg: "低谷托底包", type: "soft" },
+          { store: "杭州滨江店", status: "执行中", assist: "兼职 1 人天", action: "恢复高价值优先", pkg: "高价值优先包", type: "soft" },
+          { store: "武汉群光店", status: "待反馈", assist: "暂停增援", action: "确认回落幅度", pkg: "异常干预包", type: "danger" }
+        ],
+        alerts: [
+          { title: "暑期供给回收不及时", desc: "触发门店 9 家，影响效率恢复。", tag: "已触发", tagClass: "warning" },
+          { title: "高价值承接恢复慢", desc: "触发门店 7 家，需做结构修复。", tag: "需处理", tagClass: "danger" },
+          { title: "开学季儿童场景抬升", desc: "触发门店 5 家，可做专项承接。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "回落修复门店 9 家，结构修复门店 7 家，共 16 家门店。"
+      },
+      10: {
+        yearLabel: "2026年10月",
+        tagClass: "primary",
+        tag: "常规平稳",
+        salesIndex: "0.969",
+        revenueIndex: "0.951",
+        events: ["国庆"],
+        focusTitle: "10 月常规平稳，重点稳产出和效率",
+        focusDesc: "整体波动较小，更适合按常规节奏稳产出、控风险。",
+        focusTags: ["常规平稳", "效率稳定"],
+        mix: [["证件", 22], ["功能", 18], ["写真", 32], ["复杂写真", 28]],
+        staffing: { days: 104, stores: 12, note: "预计需出勤 336 人，以常规排班和稳产出为主。" },
+        metrics: {
+          revenue: "￥1,422万", revenueTrend: "同比 +1.8% / 环比 -4.3%",
+          point: "￥326", pointTrend: "同比 +0.9% / 环比 -2.2%",
+          aov: "￥1,052", aovTrend: "同比 +1.2% / 环比 +2.7%",
+          orders: "13,524", ordersTrend: "同比 +0.6% / 环比 -3.8%",
+          health: "81 分", healthNote: "整体稳定，局部门店需继续观察。", 
+          week: "国庆后回归常态，重点稳住产出和点位效率。",
+          resource: "兼职补位降至常规水平。"
+        },
+        strategies: [
+          { title: "常规稳产出", label: "效率优先", desc: "按常态时段配置供给，稳住产出和利用率。", pkg: "低谷托底包" },
+          { title: "局部结构修复", label: "结构修复", desc: "对个别门店继续保留高价值优先级。", pkg: "高价值优先包" }
+        ],
+        weekFocusLabel: "当前焦点：常态运行周",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "primary", tag: "节后恢复", desc: "节后回归常态排班。"},
+          { title: "第 2 周", tagClass: "success", tag: "常态运行周", desc: "按稳产出目标做常规调控。", action: "下发周度任务", pkg: "周度调控包", active: true },
+          { title: "第 3 周", tagClass: "primary", tag: "局部观察", desc: "持续监控异常门店。"},
+          { title: "第 4 周", tagClass: "primary", tag: "准备切月", desc: "开始准备 11 月结构升级月。"}
+        ],
+        storeRows: [
+          { store: "上海环球港店", status: "执行中", assist: "常规排班", action: "按常态稳产出", pkg: "低谷托底包", type: "soft" },
+          { store: "杭州滨江店", status: "待执行", assist: "兼职 1 人天", action: "局部高价值优先", pkg: "高价值优先包", type: "soft" },
+          { store: "苏州中心店", status: "待反馈", assist: "暂停增援", action: "观察异常波动", pkg: "异常干预包", type: "danger" }
+        ],
+        alerts: [
+          { title: "局部门店效率偏低", desc: "触发门店 6 家，需常规跟进。", tag: "已触发", tagClass: "warning" },
+          { title: "异常波动门店连续出现", desc: "触发门店 4 家，需做排查。", tag: "需处理", tagClass: "danger" },
+          { title: "高价值承接改善缓慢", desc: "触发门店 5 家，可局部继续优化。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "常规观察门店 6 家，异常门店 4 家，共 10 家门店。"
+      },
+      11: {
+        yearLabel: "2026年11月",
+        tagClass: "primary",
+        tag: "结构升级",
+        salesIndex: "0.850",
+        revenueIndex: "1.015",
+        events: ["双11", "转折"],
+        focusTitle: "11 月结构升级，重点提升高价值承接",
+        focusDesc: "销量偏弱但业绩回升，说明结构升级开始显现，核心是强化高价值转化承接。",
+        focusTags: ["结构升级", "双11转折"],
+        mix: [["证件", 14], ["功能", 15], ["写真", 34], ["复杂写真", 37]],
+        staffing: { days: 114, stores: 15, note: "预计需出勤 348 人，优先保障情侣、儿童、化妆等结构升级场景。" },
+        metrics: {
+          revenue: "￥1,566万", revenueTrend: "同比 +5.1% / 环比 +7.4%",
+          point: "￥349", pointTrend: "同比 +4.2% / 环比 +7.1%",
+          aov: "￥1,188", aovTrend: "同比 +8.6% / 环比 +12.9%",
+          orders: "12,184", ordersTrend: "同比 -3.1% / 环比 -4.8%",
+          health: "83 分", healthNote: "结构升级门店 15 家，重点看高价值承接能力。",
+          week: "双11前后是结构升级观察关键期，重点提高高价值场景承接。",
+          resource: "兼职补位更多投向高价值履约岗位。"
+        },
+        strategies: [
+          { title: "高价值优先", label: "结构升级", desc: "优先开放情侣、儿童、多人写真等高价值场景。", pkg: "高价值优先包" },
+          { title: "大单履约保供", label: "履约保供", desc: "对高价值门店保留重点班次和大点位。", pkg: "高峰扩供包" }
+        ],
+        weekFocusLabel: "当前焦点：结构升级周",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "primary", tag: "预热期", desc: "观察双11前结构变化。"},
+          { title: "第 2 周", tagClass: "success", tag: "结构升级周", desc: "重点提高高价值场景承接优先级。", action: "下发周度任务", pkg: "周度调控包", active: true },
+          { title: "第 3 周", tagClass: "warning", tag: "履约观察", desc: "关注大单履约是否稳定。"},
+          { title: "第 4 周", tagClass: "primary", tag: "准备切月", desc: "为 12 月高价值峰值月做准备。"}
+        ],
+        storeRows: [
+          { store: "上海环球港店", status: "执行中", assist: "兼职 4 人天", action: "高价值场景优先", pkg: "高价值优先包", type: "soft" },
+          { store: "杭州滨江店", status: "待执行", assist: "兼职 3 人天", action: "保留大单履约资源", pkg: "高峰扩供包", type: "soft" },
+          { store: "深圳万象店", status: "待反馈", assist: "暂停增援", action: "确认大单履约上限", pkg: "异常干预包", type: "danger" }
+        ],
+        alerts: [
+          { title: "高价值转化提升明显", desc: "触发门店 12 家，可扩大结构升级模板。", tag: "已触发", tagClass: "warning" },
+          { title: "大单履约资源不足", desc: "触发门店 6 家，需提前锁班。", tag: "需处理", tagClass: "danger" },
+          { title: "情侣与儿童需求抬升", desc: "触发门店 9 家，需优化场景优先级。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "结构升级门店 12 家，履约观察门店 6 家，共 18 家门店。"
+      },
+      12: {
+        yearLabel: "2026年12月",
+        tagClass: "success",
+        tag: "结构升级",
+        salesIndex: "0.933",
+        revenueIndex: "1.250",
+        events: ["圣诞", "跨年"],
+        focusTitle: "12 月业绩峰值，优先吃满高价值需求",
+        focusDesc: "业绩达到全年峰值，核心任务是优先承接情侣、好友、写真类高价值需求。",
+        focusTags: ["业绩峰值", "高价值转化最佳"],
+        mix: [["证件", 10], ["功能", 14], ["写真", 36], ["复杂写真", 40]],
+        staffing: { days: 154, stores: 21, note: "预计需出勤 414 人，重点保障圣诞与跨年高价值承接。" },
+        metrics: {
+          revenue: "￥2,184万", revenueTrend: "同比 +15.6% / 环比 +12.4%",
+          point: "￥372", pointTrend: "同比 +7.8% / 环比 +6.6%",
+          aov: "￥1,286", aovTrend: "同比 +9.4% / 环比 +8.2%",
+          orders: "14,962", ordersTrend: "同比 +4.7% / 环比 +8.9%",
+          health: "86 分", healthNote: "高价值峰值门店 21 家，需重点保供与履约。",
+          week: "圣诞到跨年是全年高价值承接核心周，重点保大单和高客单场景。",
+          resource: "兼职补位与高价值履约岗位同步拉满。"
+        },
+        strategies: [
+          { title: "高价值优先承接", label: "高价值优先", desc: "优先开放情侣、好友、单人写真等高价值场景。", pkg: "高价值优先包" },
+          { title: "跨年重点保供", label: "跨年保供", desc: "圣诞与跨年档期重点门店全量保供。", pkg: "高峰扩供包" }
+        ],
+        weekFocusLabel: "当前焦点：跨年高价值周",
+        weekPlans: [
+          { title: "第 1 周", tagClass: "primary", tag: "预热期", desc: "逐步提升高价值承接优先级。"},
+          { title: "第 2 周", tagClass: "warning", tag: "需求抬升", desc: "情侣、好友、写真需求明显抬升。"},
+          { title: "第 3 周", tagClass: "success", tag: "跨年高价值周", desc: "全年最强高价值承接周，优先保供。", action: "下发周度任务", pkg: "周度调控包", active: true },
+          { title: "第 4 周", tagClass: "primary", tag: "复盘准备", desc: "准备全年复盘和次年春节前置判断。"}
+        ],
+        storeRows: [
+          { store: "上海环球港店", status: "执行中", assist: "兼职 7 人天", action: "高价值时段全量保供", pkg: "高价值优先包", type: "soft" },
+          { store: "杭州滨江店", status: "待执行", assist: "兼职 5 人天", action: "圣诞跨年重点保供", pkg: "高峰扩供包", type: "soft" },
+          { store: "武汉群光店", status: "待反馈", assist: "暂停增援", action: "确认跨年承接边界", pkg: "异常干预包", type: "danger" }
+        ],
+        alerts: [
+          { title: "高价值预约持续高位", desc: "触发门店 16 家，需优先保供。", tag: "已触发", tagClass: "warning" },
+          { title: "跨年履约排班偏紧", desc: "触发门店 8 家，需提前锁人。", tag: "需处理", tagClass: "danger" },
+          { title: "大点位资源不足", desc: "触发门店 6 家，需重点保留。", tag: "跟进中", tagClass: "warning" }
+        ],
+        alertScope: "跨年高价值门店 16 家，履约观察门店 8 家，共 24 家门店。"
+      }
+    };
+
+    const state = {
+      currentPage: "console",
+      selectedMonth: 3,
+      selectedConsoleStrategyIndex: 0,
+      selectedConsoleTrackingWeek: 4,
+      selectedConsoleIssueIndex: 0,
+      consoleStoreKeyword: "",
+      consoleStoreIssueFilter: "全部",
+      consoleStoreStrategyFilter: "全部",
+      selectedAlert: 0,
+      libraryFilter: "全部",
+      drawerPackage: "",
+      goalEditMode: false,
+      goalValues: {},
+      published: [
+        {
+          name: "低谷托底包",
+          scope: "华东大区 23 家门店",
+          cycle: "2026-04-22 至 2026-05-12",
+          status: "执行中",
+          owner: "总部经营"
+        },
+        {
+          name: "高价值优先包",
+          scope: "上海、杭州 18 家门店",
+          cycle: "2026-04-26 至 2026-05-10",
+          status: "已发布",
+          owner: "总部经营"
+        },
+        {
+          name: "异常干预包",
+          scope: "武汉、南京 7 家门店",
+          cycle: "即时生效",
+          status: "跟进中",
+          owner: "区域管理"
+        }
+      ],
+      tasks: [
+        {
+          id: 1,
+          store: "杭州滨江店",
+          title: "执行低谷托底包",
+          detail: "18:00-20:00 增开 6 个点位，优先开放职场、证件、单人写真。",
+          status: "待执行",
+          level: "高"
+        },
+        {
+          id: 2,
+          store: "上海环球港店",
+          title: "执行高价值优先包",
+          detail: "周末 10:00-12:00 保留备婚、家庭、多人写真优先。",
+          status: "执行中",
+          level: "中"
+        },
+        {
+          id: 3,
+          store: "武汉群光店",
+          title: "执行异常干预包",
+          detail: "补充异常原因，收紧晚间加开，48 小时内回传处理结果。",
+          status: "待反馈",
+          level: "高"
+        }
+      ],
+      strategyFollowupsOpen: {},
+      strategyWeekEdits: {}
+    };
+
+    function createRecommendation(strategy, applicableProfile, triggerState, evidenceSummary) {
+      return {
+        strategy,
+        applicableProfile,
+        triggerState,
+        evidenceSummary
+      };
+    }
+
+    function getPhaseOneExample() {
+      return {
+        issue: {
+          title: "高峰价值流失-节假日",
+          definition: "高峰日期有限点位被较低价值订单占用，高价值订单承接不足，导致单位运力产出偏低。",
+          objective: "提升节假日日均客单价、提升节假日日均单点位产出",
+          primaryMetrics: [
+            { name: "节假日日均客单价", value: "342", trend: "较基线预期 +3%", tone: "up" },
+            { name: "节假日日均单点位产出", value: "150", trend: "较基线预期 +3%", tone: "up" },
+            { name: "节假日日均预约率", value: "150", trend: "较基线预期变化 <3%", tone: "up" }
+          ],
+          secondaryMetrics: "节假日日均预约率",
+          exclusion: "周期状态：淡季、证件季"
+        },
+        strategies: [
+          {
+            name: "节假日-50%证件限流",
+            applicableProfile: "老店，40W+",
+            triggerState: "节假日预约率 > 80%，节假日客单价 < 350 元",
+            valueProof: "节假日日均单点位产出较基线提升 >= 3%；节假日日均客单价较基线提升 >= 3%；节假日日均预约率较基线变化 < 3%",
+            executionStatus: "执行中",
+            executionScope: "15 家门店，节假日全天",
+            dataPerformance: "当月客单价 376，较基线 +10%，较上月 +1%；当月日均单点位产出 165，较基线 +8%，较上月 0%；当月日均预约率 148，较基线 -2%，较上月 -1%",
+            resultConclusion: "复制推广",
+            chartTitle: "周度指标变化",
+            chartHint: "观察客单价与单点位产出周度变化，辅助判断是否继续复制推广。",
+            chartSeries: [
+              { name: "客单价", color: "#335cff", values: [100, 104, 108, 110] },
+              { name: "单点位产出", color: "#10b981", values: [100, 103, 106, 108] }
+            ],
+            actionMode: "config",
+            actionLabel: "查看实例"
+          },
+          {
+            name: "节假日-30%证件限流",
+            applicableProfile: "老店，30W+",
+            triggerState: "节假日预约率 > 80%，节假日客单价 < 350 元",
+            valueProof: "节假日日均单点位产出较基线提升 >= 2%；节假日日均客单价较基线提升 >= 2%；节假日日均预约率较基线变化 < 3%",
+            executionStatus: "推荐",
+            executionScope: "待运营选择门店范围",
+            dataPerformance: "当前未执行，暂无数据表现。",
+            resultConclusion: "待执行后判断",
+            chartTitle: "周度指标变化",
+            chartHint: "执行后按周展示节假日日均客单价、单点位产出与预约率变化。",
+            chartSeries: [],
+            actionMode: "execute",
+            actionLabel: "一键执行"
+          }
+        ],
+        relations: [
+          createRecommendation("节假日-50%证件限流", "老店，40W+", "节假日预约率 > 80%，节假日客单价 < 350 元", "命中高峰价值流失-节假日问题下的推荐关系"),
+          createRecommendation("节假日-30%证件限流", "老店，30W+", "节假日预约率 > 80%，节假日客单价 < 350 元", "命中高峰价值流失-节假日问题下的推荐关系")
+        ],
+        template: {
+          title: "节假日-50%证件限流",
+          definition: "调用证件限流模版",
+          params: "应用日期：默认操作日+1 至月底；应用门店：默认符合条件的门店，可手动调整应用范围；限流数量：门店证件日均自然预约量 * 50%；动态调节：拍前 1 天预约率 70%，限流数量调整为 99",
+          optimize: "节假日日均客单价、节假日日均单点位产出",
+          risk: "节假日日均预约率",
+          observeWindow: "执行后当月数据，按周更新",
+          baseline: "执行前最近 3 周同类日期均值",
+          valueProof: "节假日日均单点位产出较基线提升 >= 3%；节假日日均客单价较基线提升 >= 3%；节假日日均预约率较基线变化 < 3%"
+        },
+        execution: {
+          id: "2026A001",
+          status: "执行中",
+          scope: "15 家门店，节假日全天",
+          params: "应用日期：20260501～20260531；限流数量：门店证件日均自然预约量 * 50%；动态调节：拍前 1 天预约率 70%，限流数量调整为 99",
+          result: "当月客单价 376，较基线 +10%，较上月 +1%；当月日均单点位产出 165，较基线 +8%，较上月 0%；当月日均预约率 148，较基线 -2%，较上月 -1%；结果结论：复制推广"
+        }
+      };
+    }
+
+    const pages = {
+      console: {
+        title: "中控台",
+        subTitle: "经营分析与策略跟进",
+        render: renderConsole
+      },
+      capacityPlanning: {
+        title: "运力统筹",
+        subTitle: "门店开点总控",
+        render: renderCapacityPlanning
+      }
+    };
+
+    function renderNav() {
+      const nav = document.getElementById("nav");
+      const items = [
+        ["console", "中控台", "经营分析与策略跟进"],
+        ["capacityPlanning", "运力统筹", "门店点位总控"]
+      ];
+      nav.innerHTML = items.map(([key, title, desc]) => `
+        <button class="nav-item ${state.currentPage === key ? "active" : ""}" onclick="switchPage('${key}')">
+          <strong>${title}</strong>
+          <span>${desc}</span>
+        </button>
+      `).join("");
+    }
+
+    function parseWanAmount(text) {
+      const matched = text.match(/([\d,\.]+)/);
+      return matched ? Number(matched[1].replace(/,/g, "")) : 0;
+    }
+
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function getCurrentMonthData() {
+      return monthData[state.selectedMonth] || monthData[7];
+    }
+
+    function setConsoleStoreKeyword(value) {
+      state.consoleStoreKeyword = value;
+      render();
+    }
+
+    function setConsoleStoreIssueFilter(value) {
+      state.consoleStoreIssueFilter = value;
+      render();
+    }
+
+    function setConsoleStoreStrategyFilter(value) {
+      state.consoleStoreStrategyFilter = value;
+      render();
+    }
+
+    function selectConsoleIssue(index) {
+      state.selectedConsoleIssueIndex = index;
+      render();
+    }
+
+    function getConsoleStoreRows(consoleView) {
+      return consoleView.storeRows || [];
+    }
+
+    function getFilteredConsoleStoreRows(consoleView) {
+      const rows = getConsoleStoreRows(consoleView);
+      const keyword = state.consoleStoreKeyword.trim().toLowerCase();
+      return rows.filter(row => {
+        const matchedStore = !keyword || [row.store, row.tags].some(item => String(item || "").toLowerCase().includes(keyword));
+        const matchedIssue = state.consoleStoreIssueFilter === "全部" || row.issue === state.consoleStoreIssueFilter;
+        const matchedStrategy = state.consoleStoreStrategyFilter === "全部"
+          || (state.consoleStoreStrategyFilter === "未推荐策略" ? !row.strategy : row.strategy === state.consoleStoreStrategyFilter);
+        return matchedStore && matchedIssue && matchedStrategy;
+      });
+    }
+
+    function getConsoleStatusTagClass(status) {
+      const map = {
+        "待处理": "danger",
+        "处理中": "warning",
+        "观察中": "primary",
+        "已关闭": "success",
+        "待确认": "neutral",
+        "已确认": "primary",
+        "已驳回": "danger",
+        "已过期": "neutral",
+        "未开始": "neutral",
+        "未执行": "danger",
+        "执行中": "warning",
+        "已完成": "success",
+        "已撤销": "neutral"
+      };
+      return map[status] || "neutral";
+    }
+
+    function getConsoleEffectTagClass(effect) {
+      const map = {
+        "有效": "success",
+        "局部改善": "warning",
+        "轻度改善": "primary",
+        "改善不稳定": "warning",
+        "待观察": "neutral",
+        "无明显改善": "danger",
+        "不适用": "neutral",
+        "执行不到位": "danger"
+      };
+      return map[effect] || "neutral";
+    }
+
+    function formatNaturalWeekDate(date) {
+      return `${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+    }
+
+    function getYearWeekNumber(date) {
+      const current = new Date(date);
+      current.setHours(0, 0, 0, 0);
+      const day = current.getDay() || 7;
+      current.setDate(current.getDate() + 4 - day);
+      const yearStart = new Date(current.getFullYear(), 0, 1);
+      return Math.ceil((((current - yearStart) / 86400000) + 1) / 7);
+    }
+
+    function getNaturalWeekStatus(start, end) {
+      const today = new Date(2026, 5, 17);
+      if (today < start) return "未开始";
+      if (today > end) return "已结束";
+      return "当前周";
+    }
+
+    function getMonthNaturalWeeks(month) {
+      const year = 2026;
+      const monthStart = new Date(year, month - 1, 1);
+      const monthEnd = new Date(year, month, 0);
+      const firstWeekStart = new Date(monthStart);
+      const weekOffset = (monthStart.getDay() + 6) % 7;
+      firstWeekStart.setDate(firstWeekStart.getDate() - weekOffset);
+      const weeks = [];
+
+      for (let cursor = new Date(firstWeekStart); cursor <= monthEnd; cursor.setDate(cursor.getDate() + 7)) {
+        const start = new Date(cursor);
+        const end = new Date(cursor);
+        end.setDate(end.getDate() + 6);
+        if (end < monthStart || start > monthEnd) continue;
+        weeks.push({ start, end });
+      }
+
+      const visibleWeeks = weeks.length > 5 ? weeks.slice(-5) : weeks;
+      return visibleWeeks.map((item, index) => {
+        const status = getNaturalWeekStatus(item.start, item.end);
+        const weekNumber = getYearWeekNumber(item.start);
+        return {
+          key: `${month}-${formatNaturalWeekDate(item.start)}`,
+          week: `W${weekNumber}`,
+          shortWeek: `${formatNaturalWeekDate(item.start)}-${formatNaturalWeekDate(item.end)}`,
+          status,
+          isCurrent: status === "当前周"
+        };
+      });
+    }
+
+    function renderStrategyReportTable(headers, rows) {
+      return `
+        <div class="strategy-report-table-wrap">
+          <table class="strategy-report-table">
+            <thead>
+              <tr>${headers.map(header => `<th>${header}</th>`).join("")}</tr>
+            </thead>
+            <tbody>
+              ${rows.map(row => `
+                <tr>${row.map(cell => `<td>${cell}</td>`).join("")}</tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function getNightOpenWeeklyReport(week) {
+      const metricRows = [
+        ["晚间拍摄业绩", "112.30 万", "已产生业绩承接，但未达周目标"],
+        ["周目标达成率", "44.92%", "距离 250.00 万目标仍有差距"],
+        ["晚间业绩目标缺口", "137.70 万", "下周需要继续找增量"],
+        ["晚间订单数", "4,284", "已有稳定订单样本"],
+        ["晚间预约率", "24.36%", "低于淡季基准线 50%，点位使用效率仍需提升"],
+        ["晚间业绩贡献率", "3.12%", "晚间对全天业绩已有补充，但贡献仍偏小"],
+        ["晚间点单价", "74.29 元/预约点位", "与上周 74.84 元接近，订单结构基本稳定"],
+        ["目标开点量", "66,806", "本周执行目标"],
+        ["实际晚间开点量", "62,060", "接近目标，但仍未完全达成"],
+        ["开点达成率", "92.90%", "未低于警戒线"],
+        ["晚间开点缺口", "4,746", "下周需继续补执行"],
+        ["整体晚间开点占比", "8.96%", "后续大区分类的执行投入参考线"],
+        ["周中预约率", "28.27%", "高于周末，是更优先挖掘的增长场景"],
+        ["周末预约率", "19.35%", "周末开点占比更高，但使用效率偏低"]
+      ];
+      const areaHeaders = ["大区", "建议动作", "门店数", "预约率", "晚间业绩贡献率", "晚间订单数", "晚间开点占比", "店均晚间业绩"];
+      const copyRows = [
+        ["深圳一区", "复制区域打法", "11", "29.82%", "8.01%", "215", "13.03%", "0.70 万"],
+        ["北京五区", "复制区域打法", "12", "39.70%", "6.26%", "187", "9.62%", "0.57 万"],
+        ["北京三区", "复制区域打法", "13", "40.73%", "4.32%", "177", "9.36%", "0.33 万"]
+      ];
+      const replenishRows = [
+        ["北京一区", "优先补执行", "14", "38.86%", "3.59%", "116", "7.53%", "0.26 万"],
+        ["杭州片区", "优先补执行", "12", "37.51%", "4.66%", "97", "6.19%", "0.30 万"],
+        ["杭嘉片区", "优先补执行", "12", "38.35%", "4.36%", "85", "5.50%", "0.24 万"],
+        ["黑吉片区", "优先补执行", "12", "32.30%", "3.21%", "122", "7.58%", "0.21 万"]
+      ];
+      const adjustRows = [
+        ["四川片区", "调整结构", "19", "19.27%", "4.64%", "231", "13.87%", "0.26 万"],
+        ["广州二区", "调整结构", "10", "23.72%", "4.14%", "138", "10.18%", "0.35 万"],
+        ["福深一区", "调整结构", "17", "15.49%", "2.58%", "73", "10.02%", "0.20 万"]
+      ];
+      const traceRows = [
+        ["上海二区", "追执行原因", "13", "14.00%", "2.18%", "61", "8.84%", "0.16 万"],
+        ["济南片区", "追执行原因", "13", "44.80%", "2.20%", "70", "5.16%", "0.14 万"],
+        ["杭婺片区", "追执行原因", "10", "26.34%", "2.57%", "46", "7.45%", "0.17 万"],
+        ["天津片区", "追执行原因", "11", "13.44%", "2.32%", "25", "4.80%", "0.14 万"],
+        ["安徽二区", "追执行原因", "10", "29.19%", "2.22%", "86", "8.54%", "0.15 万"]
+      ];
+      const benchmarkRows = [
+        ["北京龙湖亦庄天街店", "北京五区", "2.36 万", "30", "56.71%", "18.70%", "预约率和贡献率最高，晚间承接质量突出"],
+        ["深圳红山6979店", "深圳一区", "1.57 万", "34", "38.05%", "9.02%", "晚间订单稳定，业绩贡献高于整体"],
+        ["深圳海雅缤纷城店", "深圳一区", "1.27 万", "36", "27.92%", "6.15%", "订单稳定，适合作为深圳区域复制样本"],
+        ["乌鲁木齐汇嘉时代广场店", "西北三区", "1.24 万", "46", "34.98%", "12.23%", "晚间订单最多，贡献率明显高于整体"],
+        ["深圳印力中心店", "深圳二区", "1.11 万", "29", "49.69%", "12.87%", "预约率接近淡季基准线，贡献率突出"]
+      ];
+
+      return {
+        title: "晚间开点周度跟踪报告",
+        meta: `${week.week} · ${week.shortWeek}`,
+        body: `
+          <div class="strategy-report-note">适用参数：淡季口径，基准预约率基线 50%，目标开点量警戒线 60%。</div>
+          <section class="strategy-report-section">
+            <h5>本周运营结论</h5>
+            <p>本周晚间开点策略应继续推进。执行侧未低于警戒线，说明本周不是执行异常周；但实际晚间开点达成率 <span class="strategy-highlight positive">92.90%</span>，仍未完全达到目标，下周需要继续保障执行。</p>
+            <p>效果侧已经产生 <span class="strategy-highlight positive">112.30 万</span> 晚间业绩和 <span class="strategy-highlight positive">4,284 单</span> 晚间订单，说明晚间开点已经承接到实际需求；但当前只完成周目标 <span class="strategy-highlight warning">44.92%</span>，距离 250.00 万目标还有 137.70 万差距。</p>
+            <p><strong>线索：</strong>周中表现优于周末。周中晚间预约率为 28.27%，高于周末 19.35%；周末虽然晚间开点占比更高，但点位使用效率更低。</p>
+          </section>
+          <section class="strategy-report-section">
+            <h5>核心指标</h5>
+            ${renderStrategyReportTable(["指标", "结果", "运营判断"], metricRows)}
+          </section>
+          <section class="strategy-report-section">
+            <h5>诊断与建议</h5>
+            <p>整体参考线：晚间开点占比 8.96%，预约率 24.36%，晚间业绩贡献率 3.12%。下周需要重点推进三类动作：复制优秀门店做法，补足有需求信号的大区，优化低预约率区域的门店和时段结构。</p>
+          </section>
+          <section class="strategy-report-section">
+            <h5>A. 执行较充分且效果较好：保持并复制</h5>
+            <p>这类大区是下周复制对象。建议保持当前执行强度，复盘门店选择、20 点/21 点供给安排和区域经理推进方式，并将可复制做法同步给同类型大区。</p>
+            ${renderStrategyReportTable(areaHeaders, copyRows)}
+          </section>
+          <section class="strategy-report-section">
+            <h5>B. 执行不足但已有需求信号：优先补执行</h5>
+            <p>这类大区是下周补执行优先级最高的对象。建议优先补 20 点和 21 点，区域经理确认具体可补门店、排班能力和商场营业约束，补点后继续跟踪预约率和晚间订单变化。</p>
+            ${renderStrategyReportTable(areaHeaders, replenishRows)}
+          </section>
+          <section class="strategy-report-section">
+            <h5>C. 执行较充分但效果不足：调整门店和时段结构</h5>
+            <p>这类大区晚间开点占比不低，但预约率偏低或晚间贡献不足，说明当前点位安排与需求匹配不够。建议检查低预约率门店、低效日期和低效时段，把点位转向已有预约承接的门店。</p>
+            ${renderStrategyReportTable(areaHeaders, adjustRows)}
+          </section>
+          <section class="strategy-report-section">
+            <h5>D. 执行不足且效果不足：先追原因</h5>
+            <p>这类大区本周不作为优先增长对象。区域经理先反馈执行受阻原因，包括排班不支持、商场营业限制、门店未按要求开点、临时关点、系统配置问题等。</p>
+            ${renderStrategyReportTable(areaHeaders, traceRows)}
+          </section>
+          <section class="strategy-report-section">
+            <h5>标杆门店案例</h5>
+            <p>以下门店作为本周标杆，主要因为晚间订单数稳定，预约率或晚间业绩贡献率表现较好，且不是单一偶发订单带来的结果。</p>
+            ${renderStrategyReportTable(["门店", "大区", "晚间业绩", "晚间订单", "预约率", "晚间业绩贡献率", "运营参考"], benchmarkRows)}
+          </section>
+        `
+      };
+    }
+
+    function getDefaultConsoleWeekIndex(month, weeks) {
+      const currentIndex = weeks.findIndex(item => item.isCurrent);
+      if (currentIndex >= 0) return currentIndex;
+      return Math.max(weeks.length - 1, 0);
+    }
+
+    function getConsoleStrategyFocus(month, current) {
+      const naturalWeeks = getMonthNaturalWeeks(month);
+      const activeWeekIndex = getDefaultConsoleWeekIndex(month, naturalWeeks);
+
+      return {
+        strategyRows: [
+          {
+            id: "night-open",
+            name: "晚间开点",
+            resultMetric: "7.1～9.15",
+            params: "19:00-21:00；周间；大师/蓝标非集合店",
+            status: "已完成",
+            execution: "应用周期 7.1～9.15，当前策略实例绑定“晚间开点-V1”，实际达成和过程指标由系统回填。",
+            diagnosis: "通过增加晚间可约点位，承接晚间未满足需求；优化指标为晚间拍摄业绩，执行指标为晚间开点量。",
+            nextAction: "若周期复盘继续成立，下一步评估是否启用 V2，将周末纳入应用日期。",
+            note: "当前策略参数：开点时段 19:00～21:00，应用日期为周间，准入条件为大师/蓝标且非集合店。",
+            completedWeekIndex: activeWeekIndex,
+            weeks: naturalWeeks.map(item => {
+              return {
+                week: item.week,
+                shortWeek: item.shortWeek,
+                status: item.status,
+                progress: {
+                  title: "累计指标",
+                  metrics: [
+                    { label: "累计晚间拍摄业绩", value: "1065W/1000W", progress: "", highlights: [{ text: "1065W", tone: "positive" }] },
+                    { label: "累计晚间开点量", value: "82W/80W", progress: "", highlights: [{ text: "82W", tone: "positive" }] }
+                  ]
+                },
+                report: getNightOpenWeeklyReport(item)
+              };
+            })
+          }
+        ]
+      };
+    }
+
+    function selectConsoleStrategy(index) {
+      state.selectedConsoleStrategyIndex = index;
+      const current = getCurrentMonthData();
+      const strategyFocus = getConsoleStrategyFocus(state.selectedMonth, current);
+      const selectedStrategy = strategyFocus.strategyRows[index] || strategyFocus.strategyRows[0];
+      state.selectedConsoleTrackingWeek = selectedStrategy?.completedWeekIndex ?? 0;
+      render();
+    }
+
+    function selectConsoleTrackingWeek(index) {
+      state.selectedConsoleTrackingWeek = index;
+      render();
+    }
+
+    function renderMetricValue(value) {
+      if (!value.includes("/")) return value;
+      const [actual] = value.split("/");
+      return `<span class="metric-actual">${actual}</span>`;
+    }
+
+    function renderConsoleRadar(radar) {
+      const items = radar.items;
+      const centerX = 200;
+      const centerY = 150;
+      const radius = 82;
+      const angleStep = Math.PI * 2 / items.length;
+      const startAngle = -Math.PI / 2;
+      const pointFor = (score, index, scale = 1) => {
+        const ratio = (score / 100) * scale;
+        const angle = startAngle + angleStep * index;
+        return {
+          x: centerX + Math.cos(angle) * radius * ratio,
+          y: centerY + Math.sin(angle) * radius * ratio
+        };
+      };
+      const labelFor = index => {
+        const angle = startAngle + angleStep * index;
+        return {
+          x: centerX + Math.cos(angle) * 132,
+          y: centerY + Math.sin(angle) * 132
+        };
+      };
+      const anchorFor = x => {
+        if (x < centerX - 18) return "end";
+        if (x > centerX + 18) return "start";
+        return "middle";
+      };
+      const levelPoints = [0.25, 0.5, 0.75, 1].map(level => items.map((_, index) => {
+        const point = pointFor(100, index, level);
+        return `${point.x},${point.y}`;
+      }).join(" "));
+      const currentPoints = items.map((item, index) => {
+        const point = pointFor(item.plot, index);
+        return `${point.x},${point.y}`;
+      }).join(" ");
+      const lastPoints = items.map((item, index) => {
+        const point = pointFor(item.lastPlot, index);
+        return `${point.x},${point.y}`;
+      }).join(" ");
+      return `
+        <svg viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg" aria-label="全局分析评分雷达图">
+          ${levelPoints.map(points => `<polygon points="${points}" fill="none" stroke="#e2e8f0" stroke-width="1"/>`).join("")}
+          ${items.map((item, index) => {
+            const outer = pointFor(100, index);
+            return `<line x1="${centerX}" y1="${centerY}" x2="${outer.x}" y2="${outer.y}" stroke="#e2e8f0" stroke-width="1"/>`;
+          }).join("")}
+          <polygon points="${lastPoints}" fill="rgba(148, 163, 184, 0.08)" stroke="#94a3b8" stroke-width="2"/>
+          <polygon points="${currentPoints}" fill="rgba(51, 92, 255, 0.12)" stroke="#335cff" stroke-width="2.4"/>
+          ${items.map((item, index) => {
+            const current = pointFor(item.plot, index);
+            const last = pointFor(item.lastPlot, index);
+            const label = labelFor(index);
+            const anchor = anchorFor(label.x);
+            const inner = pointFor(item.lastPlot * 0.88, index);
+            return `
+              <circle cx="${last.x}" cy="${last.y}" r="3.5" fill="#94a3b8"/>
+              <circle cx="${current.x}" cy="${current.y}" r="4" fill="#335cff"/>
+              <text x="${label.x}" y="${label.y}" fill="#111827" font-size="12" font-weight="600" text-anchor="${anchor}">${item.label}</text>
+              <text x="${label.x}" y="${label.y + 16}" fill="#335cff" font-size="11" text-anchor="${anchor}">${item.value}</text>
+              <text x="${inner.x}" y="${inner.y}" fill="#94a3b8" font-size="10" text-anchor="middle">${item.lastValue}</text>
+            `;
+          }).join("")}
+        </svg>
+      `;
+    }
+
+    function getConsoleMonthView(month, current) {
+      const details = {
+        3: {
+          summaryTitle: "3 月月度形势分析",
+          summaryDesc: "",
+          scope: "全国蓝标 / 大师门店",
+          executionCount: "3 个",
+          storeCount: "60 家",
+          radar: {
+            items: [
+              { label: "租售比", value: "3.42", lastValue: "3.68", plot: 66, lastPlot: 74 },
+              { label: "均单价", value: "479元", lastValue: "457元", plot: 61, lastPlot: 73 },
+              { label: "预约率", value: "71%", lastValue: "69%", plot: 78, lastPlot: 75 },
+              { label: "周间周末比", value: "1.48", lastValue: "1.36", plot: 64, lastPlot: 69 },
+              { label: "老客占比", value: "18.6%", lastValue: "17.1%", plot: 72, lastPlot: 70 }
+            ]
+          },
+          brief: {
+            lead: "3 月核心问题不是需求不足，而是订单增长下的结构降级，需优先修复高价值承接。",
+            paragraphs: [
+              "宏观业绩判断上，<span class=\"console-brief-negative\">GMV 环比下降 10.76%</span>，但 <span class=\"console-brief-positive\">同比仍增长 9.95%</span>；同时 <span class=\"console-brief-positive\">总单量环比增长 33.19%</span>，<span class=\"console-brief-negative\">AOV 环比下降 33.00%</span>。报告判断本月核心矛盾不是需求不足，而是订单增长没有转成更高的金额产出。",
+              "核心变化归因为结构降级。3 月 <span class=\"console-brief-negative\">总预约点位环比下降 4.07%</span>，但 <span class=\"console-brief-positive\">总单量环比增长 33.19%</span>，说明本月承接了更多订单，但单位订单消耗的点位和价值都在下降，更接近高周转、低客单订单放量。",
+              "产品结构上，写真订单份额从 66.57% 降到 <span class=\"console-brief-negative\">47.55%</span>，功能订单份额从 33.43% 升到 <span class=\"console-brief-positive\">52.45%</span>；渠道结构上，美团-线上预约份额提升 <span class=\"console-brief-positive\">6.96pp</span>，小程序份额下降 <span class=\"console-brief-negative\">4.90pp</span>，新增订单更多来自平台型流量。",
+              "供给侧并未形成增长瓶颈。<span class=\"console-brief-positive\">总开点量环比增长 17.74%</span>，强于点位和金额表现，报告结论是本月更像扩供承接了更多低客单订单，而不是高价值订单供不应求。"
+            ],
+            note: "查看完整报告获取完整数据口径与图表。"
+          },
+          problems: [
+            {
+              seq: "01",
+              name: "高峰单位价值偏低",
+              scope: "11 家门店，集中在核心商圈高热低价门店",
+              severity: "重度",
+              status: "处理中",
+              coreMetric: "产品结构：均单价",
+              storePosition: "高热低价",
+              scene: "周末高峰",
+              mainReason: "高峰短工时 / 低客单品类占比偏高",
+              insight: "细分原因主要集中在高客单产品可约点位不足、高客单产品曝光不足、渠道低客单订单集中。",
+              summary: "周末高峰的高热低价门店，高价值订单承接偏弱。",
+              evidence: "AOV 明显下滑，说明高峰时段的价值承接没有跟上订单规模增长。",
+              tracking: {
+                scope: "11 家门店",
+                status: "处理中",
+                effect: "局部改善",
+                result: "均单价止跌，但还没有回到健康区间；高热低价门店的高峰单位产出开始回升，不过核心商圈样本仍存在明显波动。",
+                metricBack: "重度门店从 11 家收敛到 8 家，高价值预约占比出现回升迹象，但周末黄金时段仍被低价值订单挤占。",
+                judgement: "问题出现缓解，但还不足以关闭；4 月仍需继续作为结构修复主问题保留。",
+                conclusion: "当前主矛盾仍在高峰价值承接，不是单纯供给不足。"
+              },
+              strategies: [
+                {
+                  name: "高峰时段高客单产品点位保护",
+                  scene: "周末高峰 / 高热低价 / 核心商圈",
+                  reason: "高峰短工时下，低客单品类占比偏高，高客单产品可约点位不足。",
+                  status: "执行中",
+                  executionReview: "执行率 62.5%（5/8）；已执行门店 5 家，未执行门店 3 家，当前仍有部分核心商圈门店未完全落地。",
+                  effectiveness: "已执行门店中，被保护点位售出率达到 71%，高价值预约占比止跌回升，说明策略对高峰价值承接已有正向作用。",
+                  judgement: "继续执行：优先补齐未执行门店，再观察高峰均单价能否继续回升。"
+                },
+                {
+                  name: "证件高峰限流",
+                  scene: "周末黄金时段 / 证件占比偏高门店",
+                  reason: "证件单集中占用周末黄金时段，挤压高价值产品预约承接。",
+                  status: "执行中",
+                  executionReview: "执行率 50.0%（3/6）；已执行门店 3 家，未执行门店 3 家，当前仍处于小范围试点。",
+                  effectiveness: "已执行门店中，周末高峰证件单占比出现回落，但均单价改善幅度仍有限，样本稳定性不足。",
+                  judgement: "继续观察：先验证试点门店是否持续改善，再决定是否扩大。"
+                }
+              ],
+              storeViews: {}
+            },
+            {
+              seq: "02",
+              name: "周间周末需求分布失衡",
+              scope: "8 家门店，集中在周末高峰门店",
+              severity: "中度",
+              status: "处理中",
+              coreMetric: "峰谷差异：周间周末比",
+              storePosition: "峰谷失衡",
+              scene: "周间 / 周末",
+              mainReason: "周间需求弱且周末需求集中",
+              insight: "细分原因主要集中在周末低客单品类集中、周间缺少引导、周间承接品类不足。",
+              summary: "需求过度集中在周末，周间空转与周末挤压并存。",
+              evidence: "需求并未消失，而是过度集中在周末，导致周间空转和周末挤压并存。",
+              tracking: {
+                scope: "8 家门店",
+                status: "处理中",
+                effect: "改善不稳定",
+                result: "周末高峰抢位现象出现局部缓解，但周间承接没有同步抬升，峰谷差仍然偏大。",
+                metricBack: "周间周末比改善有限，说明当前调整更多缓解了高峰拥挤，还没有真正把需求拉回周间。",
+                judgement: "问题仍成立，后续需要把时间结构调控和周间承接一起看，而不是只做周末压缩。",
+                conclusion: "单独限流无法解决峰谷失衡，必须叠加周间承接策略。"
+              },
+              strategies: [
+                {
+                  name: "证件高峰限流",
+                  scene: "周末高峰 / 证件占比偏高门店",
+                  reason: "周末低客单订单过度集中，高峰拥挤缓解后仍需回看周间承接。",
+                  status: "执行中",
+                  executionReview: "执行率 66.7%（4/6）；已执行门店 4 家，未执行门店 2 家，落地节奏快于周间配套动作。",
+                  effectiveness: "已执行门店中，周末抢位压力有所缓解，但周间周末比改善有限，说明单独限流不足以解决时间结构失衡。",
+                  judgement: "继续观察：与周间承接策略配套后再评估整体有效性。"
+                },
+                {
+                  name: "周间档期加权推荐",
+                  scene: "周间低预约率日期 / 峰谷失衡门店",
+                  reason: "周间缺少前置引导，周末需求未被有效分流到周间。",
+                  status: "执行中",
+                  executionReview: "执行率 33.3%（2/6）；已执行门店 2 家，未执行门店 4 家，目前覆盖面偏小。",
+                  effectiveness: "已执行门店中，周间曝光和点位点击有改善，但尚未形成稳定的预约转化抬升。",
+                  judgement: "建议补上：如果只做周末收口，不做周间承接，峰谷问题仍会反复。"
+                }
+              ],
+              storeViews: {}
+            },
+            {
+              seq: "03",
+              name: "周间可售点位消化不足",
+              scope: "7 家门店，集中在周间偏弱门店",
+              severity: "中度",
+              status: "观察中",
+              coreMetric: "门店热度：预约率",
+              storePosition: "低热门店",
+              scene: "周间",
+              mainReason: "周间需求不足或预约转化不足",
+              insight: "细分原因主要集中在周间入口曝光不足、周间权益不足、可约时间不匹配、目标客群触达不足。",
+              summary: "周间有供给，但点位消化速度偏慢。",
+              evidence: "周间档期有供给，但消化速度慢，问题更多在需求组织和转化承接。",
+              tracking: {
+                scope: "7 家门店",
+                status: "观察中",
+                effect: "轻度改善",
+                result: "周间预约率有回升，但还没有形成稳定改善；目前更像是局部托底有效，而不是问题已经解决。",
+                metricBack: "部分门店点位消化率回升 2-3pp，但整体仍低于健康基线，问题状态更适合继续观察。",
+                judgement: "问题暂不升级，但也不应关闭；需要继续看周间推荐和触达动作能否形成持续效果。",
+                conclusion: "当前不是强干预问题，更适合持续做轻量引导和观察。"
+              },
+              strategies: [
+                {
+                  name: "周间档期加权推荐",
+                  scene: "周间低预约率日期 / 周中偏弱门店",
+                  reason: "周间入口曝光不足、可约时间与目标客群节奏不匹配。",
+                  status: "已完成",
+                  executionReview: "执行率 75.0%（3/4）；已执行门店 3 家，未执行门店 1 家，主要动作已基本落地。",
+                  effectiveness: "已执行门店中，周间点位消化率回升 2-3pp，预约率有抬升，但改善幅度仍偏温和。",
+                  judgement: "轻度有效：适合继续保留为轻量托底动作。"
+                },
+                {
+                  name: "周间需求激活活动",
+                  scene: "周间空闲时段 / 目标客群触达不足门店",
+                  reason: "目标客群触达不足，单靠排期前置难以补足周间需求。",
+                  status: "执行中",
+                  executionReview: "执行率 25.0%（1/4）；已执行门店 1 家，未执行门店 3 家，目前仍停留在补充策略验证阶段。",
+                  effectiveness: "已执行门店样本过少，暂未看到稳定的数据抬升，当前无法判断策略是否有效。",
+                  judgement: "谨慎评估：若周间继续走弱，再叠加轻量权益和触达动作。"
+                }
+              ],
+              storeViews: {}
+            }
+          ],
+          storeRows: [
+            { store: "上海环球港店", tags: "高热低价 / 核心商圈", issue: "高峰单位价值偏低", strategy: "高峰时段高客单产品点位保护", execution: "执行中", metrics: "预约率 79%，均单价 462 元" },
+            { store: "杭州滨江店", tags: "高热低价 / 周末高峰", issue: "高峰单位价值偏低", strategy: "证件高峰限流", execution: "未开始", metrics: "周末预约率 83%，功能单占比 57%" },
+            { store: "南京新街口店", tags: "高热低价 / 平台流量偏高", issue: "高峰单位价值偏低", strategy: "高峰时段高客单产品点位保护", execution: "执行中", metrics: "平台订单占比提升，客单承压" },
+            { store: "苏州中心店", tags: "峰谷失衡 / 周间偏弱", issue: "周间周末需求分布失衡", strategy: "周间档期加权推荐", execution: "未开始", metrics: "周间场景承接不足" },
+            { store: "武汉群光店", tags: "低热低价 / 周中偏弱", issue: "周间可售点位消化不足", strategy: "周间档期加权推荐", execution: "已完成", metrics: "周间预约率 41%，点位消化率回升" },
+            { store: "合肥万象店", tags: "低热高价 / 曝光不足", issue: "周间可售点位消化不足", strategy: "周间需求激活活动", execution: "未开始", metrics: "周间流量不足" },
+            { store: "成都银泰店", tags: "高热高价 / 表现平稳", issue: "", strategy: "", execution: "", metrics: "结构稳定，暂无新增策略" },
+            { store: "西安小寨店", tags: "低热低价 / 恢复中", issue: "", strategy: "", execution: "", metrics: "恢复中，暂未进入推荐池" }
+          ]
+        }
+      };
+      if (details[month]) return details[month];
+
+      const problems = current.alerts.slice(0, 3).map((alert, index) => {
+        const relatedStores = current.storeRows.slice(0, 2).map(row => ({
+          store: row.store,
+          tags: row.assist,
+          issue: alert.title,
+          strategy: row.pkg,
+          execution: row.status,
+          metrics: current.metrics.healthNote
+        }));
+        return {
+          seq: String(index + 1).padStart(2, "0"),
+          name: alert.title,
+          scope: alert.desc,
+          severity: index === 0 ? "中度" : "轻度",
+          status: index === 0 ? "处理中" : index === 1 ? "观察中" : "待处理",
+          coreMetric: index === 0 ? "产品结构：均单价" : index === 1 ? "门店热度：预约率" : "峰谷差异：周间周末比",
+          storePosition: index === 0 ? "高热低价" : index === 1 ? "低热门店" : "峰谷失衡",
+          scene: index === 0 ? "周末高峰" : index === 1 ? "周间" : "周间 / 周末",
+          mainReason: "当前为通用占位口径，后续可替换为真实主可行动原因。",
+          insight: "后续可补齐细分原因归并结果与推荐分组。",
+          summary: alert.desc,
+          evidence: alert.desc,
+          tracking: {
+            scope: alert.desc,
+            status: index === 0 ? "处理中" : index === 1 ? "观察中" : "待处理",
+            effect: index === 0 ? "待观察" : index === 1 ? "轻度改善" : "无明显改善",
+            result: `${alert.title} 当前仍需继续观察，后续建议补齐真实复盘结论。`,
+            metricBack: "指标与范围变化待补齐。",
+            judgement: "当前为占位判断，正式版需替换为真实问题维度复盘。",
+            conclusion: "后续补充真实复盘结论。"
+          },
+          strategies: current.strategies.slice(0, 2).map((item, strategyIndex) => ({
+            name: item.title,
+            scene: current.alertScope || `${current.staffing.stores} 家门店`,
+            reason: "当前为占位细分原因，正式版需替换为真实策略适用原因。",
+            status: strategyIndex === 0 ? "执行中" : "未开始",
+            executionReview: strategyIndex === 0 ? "执行率 50.0%（2/4）；已执行门店 2 家，未执行门店 2 家，当前仍在推进落地。" : "执行率 0.0%（0/3）；已执行门店 0 家，未执行门店 3 家，当前尚未进入实际执行。",
+            effectiveness: strategyIndex === 0 ? "已执行门店中，相关过程指标已有改善，但仍需补充更多门店样本验证。" : "当前尚无执行样本，暂时无法判断策略是否有效。",
+            judgement: item.desc
+          })),
+          storeViews: {}
+        };
+      });
+      return {
+        summaryTitle: current.focusTitle || `${current.yearLabel} 月度判断`,
+        summaryDesc: "",
+        scope: "全国蓝标 / 大师门店",
+        executionCount: `${Math.max(current.strategies.length, 1)} 个`,
+        storeCount: `${current.staffing.stores} 家`,
+        radar: {
+          items: [
+            { label: "租售比", value: "3.20", lastValue: "3.08", plot: 72, lastPlot: 69 },
+            { label: "均单价", value: "512元", lastValue: "487元", plot: 70, lastPlot: 68 },
+            { label: "预约率", value: "68%", lastValue: "65%", plot: 76, lastPlot: 74 },
+            { label: "周间周末比", value: "1.39", lastValue: "1.42", plot: 71, lastPlot: 72 },
+            { label: "老客占比", value: "16.8%", lastValue: "15.7%", plot: 69, lastPlot: 67 }
+          ]
+        },
+        brief: {
+          lead: current.focusTitle || `${current.yearLabel} 当前以占位简报承接页面结构。`,
+          paragraphs: [
+            current.focusDesc || "当前月份暂无详细形势分析。",
+            "后续可补充规模、价值、结构、供给四类月度结论段落。",
+            "此处仅作为页面结构占位，不代表最终业务结论。"
+          ],
+          note: "查看完整报告获取完整数据口径与图表。"
+        },
+        problems,
+        storeRows: current.storeRows.slice(0, 6).map(row => ({
+          store: row.store,
+          tags: row.assist,
+          issue: row.action,
+          strategy: row.pkg || "",
+          execution: row.status,
+          metrics: current.metrics.healthNote
+        }))
+      };
+    }
+
+    function getWeekTrend(month) {
+      const map = {
+        1: [96, 100, 108, 112, 106, 101],
+        2: [92, 89, 86, 88, 90, 91],
+        3: [91, 90, 94, 92, 95, 93],
+        4: [90, 88, 87, 89, 90, 92],
+        5: [94, 96, 99, 95, 97, 98],
+        6: [96, 98, 101, 104, 108, 110],
+        7: [101, 108, 110, 118, 124, 116],
+        8: [110, 116, 121, 128, 132, 126],
+        9: [124, 120, 113, 108, 104, 102],
+        10: [103, 101, 99, 100, 101, 102],
+        11: [100, 103, 106, 111, 114, 110],
+        12: [112, 116, 121, 128, 134, 138]
+      };
+      return map[month] || map[7];
+    }
+
+    function getWeekSnapshot(current) {
+      const revenue = Math.round(parseWanAmount(current.metrics.revenue) / 4);
+      const point = Math.round(parseWanAmount(current.metrics.point) * 1.02);
+      const stores = Math.min(Math.max(current.storeRows.length + 6, 8), current.staffing.stores);
+      return {
+        revenue: `￥${revenue}万`,
+        point: `￥${point}`,
+        stores: `${stores} 家`
+      };
+    }
+
+    function getWeekMetrics(month, current) {
+      const trend = getWeekTrend(month).slice(2);
+      const revenueBase = parseWanAmount(current.metrics.revenue) / 4;
+      const pointBase = parseWanAmount(current.metrics.point);
+      return trend.map((value, index) => {
+        const factor = value / 100;
+        return {
+          week: `W${index + 1}`,
+          revenue: `￥${Math.round(revenueBase * factor)}万`,
+          point: `￥${Math.round(pointBase * (factor * 0.98 + 0.02))}`
+        };
+      });
+    }
+
+    function getActiveWeekIndex(current) {
+      const index = current.weekPlans.findIndex(item => item.active);
+      return index >= 0 ? index : 1;
+    }
+
+    function getWeekTargetMetrics(month, current) {
+      const goalRevenue = parseWanAmount(getGoalValues(month, current).revenue);
+      const weights = getWeekTrend(month).slice(2);
+      const totalWeight = weights.reduce((sum, item) => sum + item, 0) || 1;
+      return weights.map((weight, index) => ({
+        week: `W${index + 1}`,
+        revenue: Math.round(goalRevenue * weight / totalWeight)
+      }));
+    }
+
+    function getWeekChartData(month, current) {
+      const activeWeekIndex = getActiveWeekIndex(current);
+      const currentWeekActual = getWeekMetrics(month, current).map(item => parseWanAmount(item.revenue));
+      const targetWeekData = getWeekTargetMetrics(month, current).map(item => item.revenue);
+      const prevMonth = month === 1 ? 12 : month - 1;
+      const prevCurrent = monthData[prevMonth];
+      const prevActual = getWeekMetrics(prevMonth, prevCurrent).slice(2).map(item => parseWanAmount(item.revenue));
+      const prevTarget = getWeekTargetMetrics(prevMonth, prevCurrent).slice(2).map(item => item.revenue);
+      return {
+        labels: ["上W3", "上W4", "W1", "W2", "W3", "W4"],
+        actual: [
+          prevActual[0],
+          prevActual[1],
+          ...currentWeekActual.map((value, index) => index <= activeWeekIndex ? value : null)
+        ],
+        target: [prevTarget[0], prevTarget[1], ...targetWeekData],
+        activeWeekIndex
+      };
+    }
+
+    function formatWeekDateRange(month, startDay, endDay) {
+      return `${month}/${startDay}-${month}/${endDay}`;
+    }
+
+    function getWeekRanges(month) {
+      const year = 2026;
+      const lastDay = new Date(year, month, 0).getDate();
+      const ranges = [
+        { title: "W1", start: 1, end: Math.min(7, lastDay) },
+        { title: "W2", start: 8, end: Math.min(14, lastDay) },
+        { title: "W3", start: 15, end: Math.min(21, lastDay) },
+        { title: "W4", start: 22, end: lastDay }
+      ];
+      return ranges.map((item, index) => ({
+        ...item,
+        days: item.end - item.start + 1,
+        range: formatWeekDateRange(month, item.start, item.end),
+        status: index < getActiveWeekIndex(monthData[month]) ? "已结束" : index === getActiveWeekIndex(monthData[month]) ? "进行中" : "未开始"
+      }));
+    }
+
+    function getWeeklyKpis(month, current) {
+      const targets = getWeekTargetMetrics(month, current);
+      const actuals = getWeekMetrics(month, current);
+      const ranges = getWeekRanges(month);
+      const aovBase = parseWanAmount(current.metrics.aov);
+      const ordersBase = parseWanAmount(current.metrics.orders) / 4;
+      return ranges.map((range, index) => {
+        const factor = getWeekTrend(month).slice(2)[index] / 100;
+        return {
+          ...range,
+          revenue: actuals[index].revenue,
+          point: actuals[index].point,
+          aov: `￥${Math.round(aovBase * (factor * 0.96 + 0.04))}`,
+          orders: `${Math.round(ordersBase * factor)}`,
+          revenueTarget: `￥${targets[index].revenue}万`,
+          pointTarget: getGoalValues(month, current).point
+        };
+      });
+    }
+
+    function getWeekFollowMetricConfig(title) {
+      const map = {
+        "高峰时段大单保护": { metric: "高价值订单承接率", values: ["71%", "74%", "76%", "72%"] },
+        "低谷时段9.5折券": { metric: "低谷时段转化率", values: ["12.4%", "13.1%", "13.6%", "12.8%"] },
+        "自动开点": { metric: "目标开点执行率", values: ["92%", "96%", "88%", "待开始"] }
+      };
+      return map[title] || { metric: "周度跟进指标", values: ["-", "-", "-", "-"] };
+    }
+
+    function getWeeklyFollowups(month, current) {
+      const activeWeekIndex = getActiveWeekIndex(current);
+      const strategyPkgMap = {
+        "高价值优先包": "高峰时段大单保护",
+        "低谷托底包": "低谷时段9.5折券",
+        "周度调控包": "自动开点",
+        "高峰扩供包": "自动开点"
+      };
+      const executingTitles = [...current.strategies, current.weekPlans[activeWeekIndex]]
+        .filter(item => item?.pkg)
+        .map(item => strategyPkgMap[item.pkg])
+        .filter(Boolean);
+      const uniqueTitles = [...new Set(executingTitles)];
+      return getWeekRanges(month).map((range, index) => uniqueTitles.map(title => {
+        const config = getWeekFollowMetricConfig(title);
+        return {
+          title,
+          metric: config.metric,
+          value: config.values[index],
+          status: index < activeWeekIndex ? "已跟进" : index === activeWeekIndex ? "跟进中" : "待跟进"
+        };
+      }));
+    }
+
+    function getWeekMetricTone(actual, target, status) {
+      if (status === "未开始") return "";
+      const actualValue = parseWanAmount(actual);
+      const targetValue = parseWanAmount(target);
+      if (!targetValue) return "";
+      return actualValue / targetValue < 0.95 ? "bad" : "good";
+    }
+
+    function buildPolyline(points, values, yForValue) {
+      const segments = [];
+      let currentSegment = [];
+      values.forEach((value, index) => {
+        if (value === null || value === undefined) {
+          if (currentSegment.length) segments.push(currentSegment);
+          currentSegment = [];
+          return;
+        }
+        currentSegment.push(`${points[index]},${yForValue(value)}`);
+      });
+      if (currentSegment.length) segments.push(currentSegment);
+      return segments.map(segment => `
+        <polyline fill="none" stroke-linecap="round" stroke-linejoin="round" points="${segment.join(" ")}" />
+      `).join("");
+    }
+
+    function getStrategyCategory(item) {
+      const text = `${item.label} ${item.title} ${item.pkg}`;
+      if (text.includes("高价值") || text.includes("结构")) {
+        return "提客单";
+      }
+      if (text.includes("托底") || text.includes("放量") || text.includes("转化")) {
+        return "促转化";
+      }
+      return "提效率";
+    }
+
+    function getStrategyGroups(current) {
+      const groups = {
+        "提客单": [],
+        "促转化": [],
+        "提效率": []
+      };
+      current.strategies.forEach(item => {
+        groups[getStrategyCategory(item)].push(item);
+      });
+      return groups;
+    }
+
+    function getGoalDefaults(current) {
+      return {
+        revenue: current.metrics.revenue,
+        point: `￥${Math.round(parseWanAmount(current.metrics.point) * 1.04)}`
+      };
+    }
+
+    function getGoalValues(month, current) {
+      if (!state.goalValues[month]) {
+        state.goalValues[month] = getGoalDefaults(current);
+      }
+      return state.goalValues[month];
+    }
+
+    function updateGoalValue(field, value) {
+      const month = state.selectedMonth;
+      const current = monthData[month];
+      const base = getGoalValues(month, current);
+      state.goalValues[month] = { ...base, [field]: value };
+    }
+
+    function toggleGoalEdit() {
+      state.goalEditMode = !state.goalEditMode;
+      render();
+      showToast(state.goalEditMode ? "已进入目标编辑" : "已保存本月目标");
+    }
+
+    function getActualMix(month, current) {
+      const deltaMap = {
+        1: [2, -1, -1, 0],
+        2: [1, 0, -1, 0],
+        3: [1, 1, -1, -1],
+        4: [2, -1, 0, -1],
+        5: [1, -1, 1, -1],
+        6: [2, 0, -1, -1],
+        7: [3, -1, 0, -2],
+        8: [2, -1, 0, -1],
+        9: [1, 0, 1, -2],
+        10: [0, 1, 0, -1],
+        11: [-1, 0, 1, 0],
+        12: [-1, 0, 0, 1]
+      };
+      const deltas = deltaMap[month] || [1, 0, 0, -1];
+      return current.mix.map(([name, value], index) => [name, Math.max(0, value + deltas[index])]);
+    }
+
+    function getStrategyCatalog() {
+      return [
+        {
+          title: "高峰时段大单保护",
+          pkg: "高价值优先包",
+          category: "提客单",
+          template: "结构修复类",
+          priority: "强推荐",
+          problem: "高峰期高价值订单被普通订单挤占",
+          precondition: "重点商圈晚间预约率持续高位，且高价值订单承接率开始下滑时启用。",
+          action: "锁定黄金时段的大点位和高价值场景优先级，保护家庭、多人、复杂写真等订单承接。",
+          params: "保护时段、门店名单、高价值订单识别口径、限流比例。",
+          risk: "若总量不足仍强保护高价值订单，可能导致普通订单流失和低谷点位浪费。",
+          successCase: "2026年7月华东 CBD 商圈 12 家门店，高价值订单承接率提升到 76%，晚间业绩同步改善。",
+          failCase: "2026年3月在非高峰门店扩大使用后，普通订单流失，点位利用率下降。",
+          reviewFields: ["策略触发时间", "触发时的经营问题", "目标指标基线", "执行范围", "执行参数", "周度过程结果", "最终复盘结论"]
+        },
+        {
+          title: "限流-证件",
+          pkg: "证件放量包",
+          category: "提客单",
+          template: "结构修复类",
+          priority: "观察中",
+          problem: "证件类订单占比过高，挤压高价值承接空间",
+          precondition: "证件类占比明显高于目标结构，且高峰时段已出现高价值订单抢位问题。",
+          action: "对证件类商品做分门店、分时段限流，优先保留高价值承接空间。",
+          params: "限流门店、限流时段、可售比例、恢复阈值。",
+          risk: "限制过度会直接影响总单量，且用户侧投诉风险较高。",
+          successCase: "2025年11月重点门店限流后，高价值订单占比回升 3pct。",
+          failCase: "2026年2月低需求月份启用后，整体预约量继续下滑，托底失效。",
+          reviewFields: ["策略触发时间", "触发时的经营问题", "目标指标基线", "执行范围", "执行参数", "周度过程结果", "最终复盘结论"]
+        },
+        {
+          title: "限流-纯拍证件",
+          pkg: "",
+          category: "提客单",
+          template: "结构修复类",
+          priority: "备选策略",
+          problem: "低客单纯拍证件集中占用高峰点位",
+          precondition: "热门门店纯拍证件占比高，且可替代门店或时段仍有承接空间。",
+          action: "仅针对纯拍证件场景做更细粒度的限制，控制高峰点位被低客单订单占用。",
+          params: "商品范围、门店范围、切换时段、恢复规则。",
+          risk: "配置复杂，执行不清晰时容易引发一线误解。",
+          successCase: "2025年暑期在 6 家热点门店试用后，高峰时段结构更平衡。",
+          failCase: "若没有同城替代推荐，用户流失会更明显。",
+          reviewFields: ["策略触发时间", "触发时的经营问题", "目标指标基线", "执行范围", "执行参数", "周度过程结果", "最终复盘结论"]
+        },
+        {
+          title: "限流-结婚登记",
+          pkg: "",
+          category: "提客单",
+          template: "结构修复类",
+          priority: "备选策略",
+          problem: "低价值结婚登记需求挤占大单履约资源",
+          precondition: "结婚登记需求集中且门店大点位资源吃紧时使用。",
+          action: "在指定时段对结婚登记场景做分层限流，把资源让给高价值写真和多人场景。",
+          params: "限流档位、时段、门店与恢复条件。",
+          risk: "若判断失误，可能损失稳定刚需单量。",
+          successCase: "2025年双11前夕在 4 家大师店局部使用后，高价值订单承接恢复。",
+          failCase: "若门店本身需求不足，再限流会放大空转风险。",
+          reviewFields: ["策略触发时间", "触发时的经营问题", "目标指标基线", "执行范围", "执行参数", "周度过程结果", "最终复盘结论"]
+        },
+        {
+          title: "低谷时段9.5折券",
+          pkg: "低谷托底包",
+          category: "促转化",
+          template: "托底转化类",
+          priority: "强推荐",
+          problem: "低谷时段点位空转，转化不足",
+          precondition: "周中晚间或低峰时段预约率低于阈值，且门店仍有足够承接能力。",
+          action: "在指定低谷时段发放价格优惠，提升刚需和犹豫用户的下单转化。",
+          params: "折扣力度、适用时段、门店范围、预算上限。",
+          risk: "若过度依赖优惠，会拉低客单并形成用户价格预期。",
+          successCase: "2026年4月在周中晚间启用后，低谷时段转化率提升到 13.6%。",
+          failCase: "节假日前高需求阶段使用，容易造成不必要让利。",
+          reviewFields: ["策略触发时间", "触发时的经营问题", "目标指标基线", "执行范围", "执行参数", "周度过程结果", "最终复盘结论"]
+        },
+        {
+          title: "周间-礼赠券",
+          pkg: "",
+          category: "促转化",
+          template: "托底转化类",
+          priority: "观察中",
+          problem: "非价格敏感用户在周间缺少下单理由",
+          precondition: "低谷期不适合直接打折，但需要补一个轻量转化钩子时启用。",
+          action: "通过礼赠或加项赠送替代直接降价，改善周间下单转化。",
+          params: "礼赠内容、适用商品、核销规则、成本上限。",
+          risk: "赠品价值感不足时，对转化帮助有限且增加履约复杂度。",
+          successCase: "2025年9月在职场、证件类商品上试用后，周间转化小幅提升。",
+          failCase: "若礼赠与用户场景不匹配，基本无效果。",
+          reviewFields: ["策略触发时间", "触发时的经营问题", "目标指标基线", "执行范围", "执行参数", "周度过程结果", "最终复盘结论"]
+        },
+        {
+          title: "自动开点",
+          pkg: "周度调控包",
+          category: "提效率",
+          template: "高峰扩供类",
+          priority: "强推荐",
+          problem: "重点门店供给不足，现有人工开点跟不上需求变化",
+          precondition: "重点门店、重点时段需求显著上行，且已明确可投入排班或兼职资源。",
+          action: "按门店、日期、时段自动增开点位，并与周度任务联动持续跟进。",
+          params: "开点系数、门店范围、执行时段、排班约束。",
+          risk: "若需求判断错误，会造成过量供给和履约压力。",
+          successCase: "2026年7月执行门店 560 家，假期与周末开点系数 110%，周间 80%。",
+          failCase: "在回落月份沿用高峰参数时，点位空转明显增加。",
+          reviewFields: ["策略触发时间", "触发时的经营问题", "目标指标基线", "执行范围", "执行参数", "周度过程结果", "最终复盘结论"]
+        }
+      ];
+    }
+
+    function getStrategyCatalogMap() {
+      return Object.fromEntries(getStrategyCatalog().map(item => [item.title, item]));
+    }
+
+    function getConsoleStrategyLibrary() {
+      return {
+        "自动开点": {
+          group: "服务侧",
+          strategyName: "自动开点",
+          description: "按目标开放所需点位自动开启。",
+          keyParams: "策略参数：周间开点系数、节假日开点系数。",
+          focusRequirement: "目标开点执行率过高时需及时调整测算模型。",
+          metricName: "目标开点执行率",
+          metricUnit: "%",
+          series: [92, 96, 88, 90],
+          weekTemplates: [
+            "确认开点测算模型与目标开放范围。",
+            "跟进周间开点执行偏差，必要时调整周间系数。",
+            "复核高峰周开点执行率，校正节假日系数。",
+            "沉淀当月测算偏差，为下月参数更新做准备。"
+          ]
+        }
+      };
+    }
+
+    function formatConsoleMetricValue(value, unit) {
+      if (unit === "%") {
+        return `${Number(value).toFixed(value % 1 === 0 ? 0 : 1)}%`;
+      }
+      if (unit === "元") {
+        return `￥${Math.round(value)}`;
+      }
+      return `${value}${unit || ""}`;
+    }
+
+    function getMonthStrategySettings(month, current) {
+      const library = getConsoleStrategyLibrary();
+      const activeWeekIndex = getActiveWeekIndex(current);
+      const monthlySettings = {
+        1: [
+          {
+            strategyKey: "自动开点",
+            keyParams: "周间开点系数：80%；节假日开点系数：110%。"
+          }
+        ]
+      };
+      const selectedSettings = monthlySettings[month] || monthlySettings[1];
+      return selectedSettings.map((item, index) => {
+        const preset = library[item.strategyKey];
+        const id = `${month}-${item.strategyKey}-${index}`;
+        const metricSeries = preset.series;
+        const weeks = getWeekRanges(month).map((range, weekIndex) => ({
+          week: range.title,
+          status: range.status,
+          action: getStrategyWeekAction(month, id, range.title, preset.weekTemplates[weekIndex] || `跟进${preset.strategyName}执行情况`),
+          metricValue: formatConsoleMetricValue(metricSeries[weekIndex], preset.metricUnit)
+        }));
+        return {
+          id,
+          group: preset.group,
+          pkg: item.strategyKey,
+          strategyName: preset.strategyName,
+          strategyDesc: preset.description,
+          keyParams: item.keyParams || preset.keyParams,
+          focusRequirement: preset.focusRequirement,
+          metricName: preset.metricName,
+          metricUnit: preset.metricUnit,
+          metricSeries,
+          activeWeekIndex,
+          weeks
+        };
+      });
+    }
+
+    function getMonthStrategyGroups(month, current) {
+      const groups = { "用户侧": [], "服务侧": [] };
+      getMonthStrategySettings(month, current).forEach(item => {
+        groups[item.group].push(item);
+      });
+      return groups;
+    }
+
+    function isStrategyFollowupOpen(month, strategyId, defaultOpen = false) {
+      const key = `${month}-${strategyId}`;
+      if (Object.prototype.hasOwnProperty.call(state.strategyFollowupsOpen, key)) {
+        return state.strategyFollowupsOpen[key];
+      }
+      return defaultOpen;
+    }
+
+    function getStrategyWeekAction(month, strategyId, week, fallback) {
+      return state.strategyWeekEdits[month]?.[strategyId]?.[week] ?? fallback;
+    }
+
+    function getStrategyStatusTagClass(status) {
+      const map = {
+        "推荐": "primary",
+        "执行中": "success",
+        "观察中": "warning",
+        "可用": "neutral",
+        "暂停": "neutral",
+        "备选": "neutral"
+      };
+      return map[status] || "neutral";
+    }
+
+    function triggerStrategyAction(pkg, title, mode) {
+      if (pkg && packageMap[pkg]) {
+        if (mode === "config") {
+          openDrawer(pkg);
+        } else {
+          executePackage(pkg);
+        }
+        return;
+      }
+      showToast(`${title}${mode === "config" ? "待补充模板查看能力" : "已加入待生成执行实例清单"}`);
+    }
+
+    function openStrategyCase(title) {
+      showToast(`已打开 ${title} 的案例占位`);
+    }
+
+    function getCurrentStrategyRuntime(month, current) {
+      if ([7, 8].includes(month)) {
+        return {
+          "50% 小单限流": {
+            status: "执行中",
+            trigger: "高峰时段高价值订单承接不足，且资源极度紧张。",
+            objective: "高峰客单价 / 单点位产出",
+            scope: "热门门店 8 家 · 周末 18:00-20:00",
+            desc: "对高峰小单做强限流，优先释放高价值订单承接空间。",
+            result: "高峰客单价较上周期 +6.2%，当前继续执行中。"
+          },
+          "30% 小单限流": {
+            status: "推荐",
+            trigger: "供需偏紧但仍有扩供空间，适合先做温和结构优化。",
+            objective: "高峰客单价 / 结构修复",
+            scope: "可扩供门店 6 家 · 工作日 17:00-19:00",
+            desc: "以温和限流方式修复结构，避免过强限制影响总量。",
+            result: "已完成策略测算，待生成执行实例。"
+          },
+          "高峰时段大单保护": {
+            status: "推荐",
+            trigger: "晚间预约率连续 7 天高于 0.68，高价值订单承接被挤压。",
+            objective: "拍摄业绩 / AOV",
+            scope: "华东 CBD 商圈 12 家门店 · 18:00-20:00",
+            desc: "优先保护黄金时段高价值订单承接，避免高峰期被低价值订单抢位。",
+            result: "W3 高价值订单承接率达到 76%，建议 W4 继续观察回落速度。"
+          },
+          "自动开点": {
+            status: "执行中",
+            trigger: "需兼职增援门店持续上升，既定排班无法覆盖高峰承接。",
+            objective: "拍摄业绩 / 单开放点位产出",
+            scope: "执行门店 560 家，假期与周末重点时段",
+            desc: "按重点门店、重点时段自动补充供给，优先承接晚间高峰。",
+            result: "W3 目标开点执行率 88%，供给已补齐但履约压力开始抬升。"
+          },
+          "候补承接": {
+            status: "观察中",
+            trigger: "热门时段约满后，仍有明显预约意愿和库存释放历史。",
+            objective: "需求挽回率 / 候补转化金额",
+            scope: "热门门店 10 家 · 晚间高峰时段",
+            desc: "在约满后继续承接外溢需求，通过库存释放转正。",
+            result: "候补提交率稳定，待继续观察成功转化率。"
+          },
+          "超卖承接": {
+            status: "推荐",
+            trigger: "门店具备局部扩供能力，且高峰外溢需求持续存在。",
+            objective: "弹性承接能力 / 增量业绩",
+            scope: "履约韧性较强门店 4 家",
+            desc: "在风险可控前提下提高高峰期弹性承接能力。",
+            result: "当前保留为备选动作，待确认负荷阈值后启用。"
+          },
+          "限流-证件": {
+            status: "可用",
+            trigger: "若证件占比继续上冲并挤压高价值承接时启用。",
+            objective: "AOV / 结构修复",
+            scope: "热门门店证件类商品",
+            desc: "作为高峰后半程的结构修复备选，不在当前高峰放量阶段优先启用。",
+            result: "当前未启用，保留为回收策略。"
+          },
+          "限流-纯拍证件": {
+            status: "可用",
+            trigger: "纯拍证件高峰时段占比超过阈值时启用。",
+            objective: "AOV / 高价值承接",
+            scope: "热点门店纯拍证件场景",
+            desc: "用于更细粒度回收低客单占位，避免误伤整体证件放量。",
+            result: "当前未启用。"
+          },
+          "限流-结婚登记": {
+            status: "可用",
+            trigger: "大点位资源被低价值刚需订单持续占用时启用。",
+            objective: "高价值承接 / 点位结构",
+            scope: "重点大师店的大点位时段",
+            desc: "作为局部结构修复手段，仅在资源极度吃紧时使用。",
+            result: "当前未启用。"
+          },
+          "低谷时段9.5折券": {
+            status: "观察中",
+            trigger: "周间非高峰时段仍有局部空转，需要托底转化。",
+            objective: "总单量 / 点位利用率",
+            scope: "周间低谷时段",
+            desc: "辅助托底非高峰时段需求，避免供给补齐后出现新的空转。",
+            result: "当前只在局部门店试行，等待 W4 数据确认。"
+          },
+          "周间-礼赠券": {
+            status: "备选",
+            trigger: "若不适合直接降价但需要补转化时启用。",
+            objective: "总单量 / 转化率",
+            scope: "周间证件与职场商品",
+            desc: "替代直接折扣的轻量刺激手段。",
+            result: "当前未进入本月主策略。"
+          }
+        };
+      }
+
+      if ([2, 4].includes(month)) {
+        return {
+          "低谷时段9.5折券": {
+            status: "推荐",
+            trigger: "周中晚间预约率低于常态，点位空转损失率偏高。",
+            objective: "总单量 / 单开放点位产出",
+            scope: "低谷观察门店 14 家",
+            desc: "优先用优惠刺激低谷时段下单，先托底再看结构修复。",
+            result: "周中晚间转化率回升，但仍需控制让利幅度。"
+          },
+          "自动开点": {
+            status: "暂停",
+            trigger: "当前不适合扩供，若排班确认后再恢复。",
+            objective: "点位供给",
+            scope: "仅保留局部高效门店",
+            desc: "回落月不做大范围自动扩供，避免放大空转。",
+            result: "仅在局部高效门店维持。"
+          },
+          "周间-礼赠券": {
+            status: "观察中",
+            trigger: "不适合直接折扣的门店用礼赠补转化。",
+            objective: "转化率",
+            scope: "职场、证件品类",
+            desc: "作为低谷托底的轻量补充手段。",
+            result: "局部有效，仍需继续验证。"
+          },
+          "高峰时段大单保护": {
+            status: "可用",
+            trigger: "若局部高价值承接持续偏弱再启用。",
+            objective: "AOV",
+            scope: "重点门店周末早场",
+            desc: "当前不是主策略，但保留为结构修复备选。",
+            result: "本月未主推。"
+          }
+        };
+      }
+
+      if (month === 6) {
+        return {
+          "自动开点": {
+            status: "推荐",
+            trigger: "证件升温明显，暑期前置供给需要提前准备。",
+            objective: "拍摄业绩 / 单开放点位产出",
+            scope: "暑期准备门店 19 家",
+            desc: "先用小范围自动开点测试重点门店的承接弹性。",
+            result: "重点商圈晚间需求开始抬升，可继续放大试点。"
+          },
+          "高峰时段大单保护": {
+            status: "观察中",
+            trigger: "若高峰预热阶段已出现高价值抢位，再提前保护。",
+            objective: "AOV / 结构平衡",
+            scope: "重点商圈预热门店",
+            desc: "作为 7 月前的预备保护动作。",
+            result: "继续观察是否提前进入高峰状态。"
+          },
+          "限流-证件": {
+            status: "可用",
+            trigger: "若证件放量过快，且高价值承接被明显挤占时启用。",
+            objective: "结构平衡",
+            scope: "重点大师店",
+            desc: "保留为高峰中段的结构修复手段。",
+            result: "当前不优先启用。"
+          }
+        };
+      }
+
+      return {
+        "高峰时段大单保护": {
+          status: "观察中",
+          trigger: "高价值场景承接偏弱，需保护重点时段。",
+          objective: "AOV / 结构修复",
+          scope: "重点门店周末与黄金时段",
+          desc: "优先保护高价值订单承接，避免结构继续走弱。",
+          result: "已进入持续观察。"
+        },
+        "低谷时段9.5折券": {
+          status: "可用",
+          trigger: "若周中低谷需求明显偏弱时启用。",
+          objective: "总单量 / 转化率",
+          scope: "周间低谷时段",
+          desc: "保留为需求托底的备选动作。",
+          result: "当前不作为主策略。"
+        },
+        "自动开点": {
+          status: "执行中",
+          trigger: "重点门店供给仍需按周调节。",
+          objective: "单开放点位产出 / 供给稳定性",
+          scope: "重点门店与高效时段",
+          desc: "按重点门店做动态扩缩供给，保证总部对供给有抓手。",
+          result: "周度持续跟进中。"
+        },
+        "限流-证件": {
+          status: "可用",
+          trigger: "若证件占比再次挤压高价值承接时启用。",
+          objective: "结构平衡",
+          scope: "热点门店证件类商品",
+          desc: "作为结构修复备选。",
+          result: "当前未主推。"
+        },
+        "周间-礼赠券": {
+          status: "备选",
+          trigger: "若不适合直接折扣但需要补转化时启用。",
+          objective: "转化率",
+          scope: "周间普通商品",
+          desc: "作为轻量刺激工具保留。",
+          result: "当前未启用。"
+        }
+      };
+    }
+
+    function getCurrentStrategyPanelData(month, current) {
+      const runtime = getCurrentStrategyRuntime(month, current);
+      if ([7, 8].includes(month)) {
+        return {
+          runtime,
+          issues: [
+            {
+              title: "高峰价值流失",
+              tagClass: "primary",
+              definition: "高峰时段有限点位被较低价值订单占用，高价值订单承接不足，导致单位运力产出偏低。",
+              objective: "提升高峰客单 / 提升单点位产出",
+              primaryMetrics: [
+                { name: "高峰客单价", value: "￥1,286", trend: "较上周期 +6.2%", tone: "up" },
+                { name: "单点位产出", value: "￥356", trend: "较上周期 +4.8%", tone: "up" }
+              ],
+              secondaryMetrics: "高价值订单占比 34.6%，较上周期 +1.9pct；大单预约占比 21.4%，较上周期 +1.2pct",
+              evidence: ["高峰客单低于目标值", "高价值订单占比低于目标值", "单点位产出未达标"],
+              status: "问题已成立",
+              scope: "重点商圈黄金时段",
+              recommendations: [
+                createRecommendation("50% 小单限流", "高热度、高客单、热门门店", "高压状态", "资源极度紧张，高价值订单承接率开始下滑"),
+                createRecommendation("30% 小单限流", "高热度、中客单、可扩供门店", "偏紧状态", "仍有一定扩供空间，先做温和结构优化"),
+                createRecommendation("高峰时段大单保护", "高热度、高价值订单潜力高", "高压状态 / 偏紧状态", "重点保护高价值订单在黄金时段的承接优先级"),
+                createRecommendation("候补承接", "热门门店、热门时段、存在库存释放历史", "高压状态", "高峰约满后仍有明显预约意愿，需要继续承接外溢需求"),
+                createRecommendation("超卖承接", "高热度、可扩供、履约韧性较强", "高压状态", "在风险可控前提下提高高峰期弹性承接能力")
+              ]
+            }
+          ],
+          assets: [
+            {
+              title: "优秀应用实例",
+              desc: "自动开点已形成清晰执行模板，下一步重点沉淀开点系数与供给承接上限。",
+              tags: ["执行实例", "供给补齐", "可复用模板"]
+            },
+            {
+              title: "待沉淀模板",
+              desc: "高峰时段大单保护已具备问题映射关系，下一步要补齐退出条件与参数边界。",
+              tags: ["策略模板", "高价值保护", "需补边界"]
+            },
+            {
+              title: "复盘准备",
+              desc: "本月重点记录问题证据、执行范围、参数版本与周度结果，便于沉淀统一复盘口径。",
+              tags: ["问题复盘", "价值归因", "模板沉淀"]
+            }
+          ]
+        };
+      }
+
+      if ([2, 4].includes(month)) {
+        return {
+          runtime,
+          issues: [
+            {
+              title: "低谷时段空转",
+              tagClass: "danger",
+              objective: "提升总单量 / 单开放点位产出",
+              evidence: ["周中晚间预约率持续偏低", "点位空转损失率偏高", "供给利用不足"],
+              status: "问题已成立",
+              scope: "低谷观察门店 14 家",
+              recommendations: [
+                createRecommendation("低谷时段9.5折券", "低热度、价格敏感门店", "宽松状态", "低谷时段库存富余且转化不足"),
+                createRecommendation("周间-礼赠券", "非价格敏感门店", "平衡状态", "不适合直接打折但仍需补转化")
+              ]
+            },
+            {
+              title: "异常门店恢复慢",
+              tagClass: "warning",
+              objective: "提升总单量 / 缩短异常恢复时长",
+              evidence: ["部分门店连续低于常态", "异常恢复周期拉长", "需要先确认原因再继续投放"],
+              status: "问题已成立",
+              scope: "异常门店 5-6 家",
+              recommendations: [
+                createRecommendation("周间-礼赠券", "恢复慢但仍有需求门店", "平衡状态", "作为低成本托底动作先稳定转化"),
+                createRecommendation("自动开点", "局部高效门店", "偏紧状态", "仅保留局部高效门店的扩供动作")
+              ]
+            },
+            {
+              title: "结构修复节奏不清晰",
+              tagClass: "primary",
+              objective: "提升 AOV / 修复高价值承接结构",
+              evidence: ["回落月结构恢复慢", "高价值承接未同步回升", "过早保护会影响总量"],
+              status: "问题已成立",
+              scope: "重点门店周末时段",
+              recommendations: [
+                createRecommendation("高峰时段大单保护", "高热度、高价值潜力门店", "偏紧状态", "先局部修复重点时段的高价值承接"),
+                createRecommendation("限流-证件", "证件占比偏高门店", "偏紧状态", "低价值结构继续挤压高价值空间时启用")
+              ]
+            }
+          ],
+          assets: [
+            {
+              title: "优秀应用实例",
+              desc: "低谷时段 9.5 折券已形成明确托底场景，适合作为回落月标准执行模板继续沉淀。",
+              tags: ["执行实例", "低谷场景", "标准模板"]
+            },
+            {
+              title: "待沉淀模板",
+              desc: "周间礼赠券仍需补齐适用品类和成本边界，暂不作为默认模板放大。",
+              tags: ["策略模板", "轻量刺激", "待补字段"]
+            },
+            {
+              title: "复盘准备",
+              desc: "重点记录低谷问题下不同执行实例带来的转化改善与收益质量，避免只看订单量。",
+              tags: ["问题复盘", "收益质量", "副作用判断"]
+            }
+          ]
+        };
+      }
+
+      return {
+        runtime,
+        issues: [
+          {
+            title: "本月核心经营问题",
+            tagClass: "warning",
+            objective: "提升拍摄业绩 / AOV / 单开放点位产出",
+            evidence: [current.focusDesc, "重点门店存在明显经营优化空间"],
+            status: "问题已成立",
+            scope: `${current.staffing.stores} 家重点门店`,
+            recommendations: [
+              createRecommendation(Object.keys(runtime)[0], "重点门店", "偏紧状态", "当前核心问题优先承接"),
+              createRecommendation(Object.keys(runtime)[1], "重点门店", "偏紧状态", "作为协同修复动作同步跟进")
+            ].filter(item => item.strategy)
+          },
+          {
+            title: "结构与效率平衡",
+            tagClass: "primary",
+            objective: "提升 AOV / 单开放点位产出",
+            evidence: ["不能只看总量，还要同步观察结构和供给利用率", "局部时段存在结构与效率拉扯"],
+            status: "问题已成立",
+            scope: "重点门店与周末时段",
+            recommendations: [
+              createRecommendation(Object.keys(runtime)[1], "重点门店", "偏紧状态", "优先看结构修复动作"),
+              createRecommendation(Object.keys(runtime)[2], "热点门店", "平衡状态", "保留备选模板，按数据决定是否启用")
+            ].filter(item => item.strategy)
+          }
+        ],
+        assets: [
+          {
+            title: "优秀应用实例",
+            desc: "本月优先沉淀最有效的执行实例，形成后续可直接复用的标准模板。",
+            tags: ["执行实例", "持续沉淀", "标准化"]
+          },
+          {
+            title: "待沉淀模板",
+            desc: "本月保留正在试行但边界仍不清晰的模板，避免直接放大使用。",
+            tags: ["策略模板", "边界验证", "谨慎放大"]
+          },
+          {
+            title: "复盘准备",
+            desc: "提前记录问题证据、参数版本与周度结果，为半年复盘准备统一口径。",
+            tags: ["问题复盘", "阶段结论", "模板资产"]
+          }
+        ]
+      };
+    }
+
+    function getAlertStoreRows(current, alertIndex) {
+      const mappings = [
+        [
+          { storeIndex: 0, reason: "晚间预约率连续高位，需优先扩供" },
+          { storeIndex: 1, reason: "晚间需求上升且当前供给偏紧" }
+        ],
+        [
+          { storeIndex: 0, reason: "需增援但全职排班无法覆盖高峰" },
+          { storeIndex: 1, reason: "兼职补位需求已超出常规排班能力" }
+        ],
+        [
+          { storeIndex: 2, reason: "连续低于常态，需先完成异常确认" },
+          { storeIndex: 1, reason: "重点指标波动，进入持续观察池" }
+        ]
+      ];
+      const selected = mappings[alertIndex] || mappings[0];
+      return selected.map(item => {
+        const row = current.storeRows[item.storeIndex] || current.storeRows[0];
+        return { ...row, reason: item.reason };
+      });
+    }
+
+    function renderConsole() {
+      const current = monthData[state.selectedMonth];
+      const strategyFocus = getConsoleStrategyFocus(state.selectedMonth, current);
+      const selectedStrategy = strategyFocus.strategyRows[state.selectedConsoleStrategyIndex] || strategyFocus.strategyRows[0];
+      const selectedWeekIndex = Math.min(
+        state.selectedConsoleTrackingWeek,
+        (selectedStrategy?.weeks?.length || 1) - 1
+      );
+      const selectedWeek = selectedStrategy?.weeks?.[selectedWeekIndex] || null;
+      const selectedReport = selectedWeek?.report || null;
+      const monthCards = Object.entries(monthData).map(([month, item]) => `
+        <button type="button" class="month-card ${Number(month) === state.selectedMonth ? "active" : ""}" onclick="selectMonth(${month})">
+          <h4>${month}月</h4>
+          <span class="tag ${item.tagClass}">${item.tag}</span>
+          <div class="month-meta">
+            ${item.events.map(event => `<span class="meta">${event}</span>`).join("")}
+          </div>
+        </button>
+      `).join("");
+      const strategyListHtml = strategyFocus.strategyRows.map((item, index) => {
+        const latestProgress = item.weeks?.[Math.min(item.completedWeekIndex ?? 0, (item.weeks?.length || 1) - 1)]?.progress?.metrics || [];
+        return `
+          <button class="console-issue-button ${index === state.selectedConsoleStrategyIndex ? "active" : ""}" type="button" onclick="selectConsoleStrategy(${index})">
+            <div class="console-problem-top">
+              <div class="console-problem-title">
+                <span class="console-problem-index">${String(index + 1).padStart(2, "0")}</span>
+                <strong>${item.name}</strong>
+              </div>
+              <div class="top-actions">
+                <span class="tag ${getConsoleStatusTagClass(item.status)}">${item.status}</span>
+              </div>
+            </div>
+            <div class="console-problem-meta">
+              <div class="console-problem-row">
+                <span class="console-problem-label">应用周期</span>
+                <span class="console-problem-value">${item.resultMetric}</span>
+              </div>
+            </div>
+            ${latestProgress.length ? `
+              <div class="console-problem-metrics">
+                ${latestProgress.slice(0, 2).map(metric => `
+                  <div class="console-problem-metric">
+                    <strong>${metric.label}</strong>
+                    <div class="console-problem-metric-main">
+                      ${renderMetricValue(metric.value)}
+                    </div>
+                    <small>${metric.progressLabel || ""}</small>
+                  </div>
+                `).join("")}
+              </div>
+            ` : ""}
+          </button>
+        `;
+      }).join("");
+      const strategyTrackingHtml = selectedStrategy ? `
+        <div class="strategy-week-switch">
+          ${selectedStrategy.weeks.map((item, index) => `
+            <button class="strategy-week-button ${index === selectedWeekIndex ? "active" : ""}" type="button" onclick="selectConsoleTrackingWeek(${index})">
+              <strong>${item.week}</strong>
+              <span>${item.shortWeek}</span>
+            </button>
+          `).join("")}
+        </div>
+        ${selectedReport ? `
+          <div class="strategy-week-detail strategy-report-panel">
+            <div class="strategy-report-head">
+              <div>
+                <h4>${selectedReport.title}</h4>
+              </div>
+              <span class="strategy-report-meta">${selectedReport.meta}</span>
+            </div>
+            <div class="strategy-report-body">${selectedReport.body}</div>
+          </div>
+        ` : `<div class="console-note-line">当前暂无周度跟踪报告。</div>`}
+      ` : `<div class="console-note-line">当前暂无策略跟踪记录。</div>`;
+      return `
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>年历</h3>
+            </div>
+            <div class="top-actions">
+              <span class="chip">门店范围：蓝标 / 大师</span>
+              <span class="chip">区域范围：全国</span>
+            </div>
+          </div>
+          <div class="trend-board">
+            <div class="trend-chart">
+              <div class="block-title">
+                <h4>年内趋势曲线</h4>
+              </div>
+              <svg viewBox="0 0 1560 260" xmlns="http://www.w3.org/2000/svg" aria-label="年内趋势曲线">
+                <rect x="0" y="0" width="1560" height="260" fill="transparent" />
+                <line x1="70" y1="18" x2="70" y2="166" stroke="#cbd5e1" stroke-width="1.2"/>
+                <line x1="70" y1="166" x2="1515" y2="166" stroke="#cbd5e1" stroke-width="1.2"/>
+                <line x1="70" y1="38" x2="1515" y2="38" stroke="#e2e8f0"/>
+                <line x1="70" y1="74" x2="1515" y2="74" stroke="#e2e8f0"/>
+                <line x1="70" y1="110" x2="1515" y2="110" stroke="#c7d2fe" stroke-dasharray="5 5"/>
+                <line x1="70" y1="138" x2="1515" y2="138" stroke="#e2e8f0"/>
+                <line x1="70" y1="166" x2="1515" y2="166" stroke="#e2e8f0"/>
+                <text x="20" y="42" fill="#94a3b8" font-size="12">1.25</text>
+                <text x="20" y="78" fill="#94a3b8" font-size="12">1.10</text>
+                <text x="20" y="114" fill="#335cff" font-size="12">1.00</text>
+                <text x="20" y="142" fill="#94a3b8" font-size="12">0.90</text>
+                <text x="20" y="170" fill="#94a3b8" font-size="12">0.80</text>
+                <polyline fill="none" stroke="#335cff" stroke-width="4" points="110,132 235,130 360,102 485,104 610,87 735,64 860,52 985,18 1110,61 1235,95 1360,121 1485,98" />
+                <polyline fill="none" stroke="#06b6d4" stroke-width="4" points="110,52 235,143 360,134 485,128 610,116 735,108 860,58 985,32 1110,83 1235,106 1360,94 1485,12" />
+                <g fill="#335cff">
+                  <circle cx="110" cy="132" r="4"/><circle cx="235" cy="130" r="4"/><circle cx="360" cy="102" r="4"/>
+                  <circle cx="485" cy="104" r="4"/><circle cx="610" cy="87" r="4"/><circle cx="735" cy="64" r="4"/>
+                  <circle cx="860" cy="52" r="4"/><circle cx="985" cy="18" r="4"/><circle cx="1110" cy="61" r="4"/>
+                  <circle cx="1235" cy="95" r="4"/><circle cx="1360" cy="121" r="4"/><circle cx="1485" cy="98" r="4"/>
+                </g>
+                <g fill="#06b6d4">
+                  <circle cx="110" cy="52" r="4"/><circle cx="235" cy="143" r="4"/><circle cx="360" cy="134" r="4"/>
+                  <circle cx="485" cy="128" r="4"/><circle cx="610" cy="116" r="4"/><circle cx="735" cy="108" r="4"/>
+                  <circle cx="860" cy="58" r="4"/><circle cx="985" cy="32" r="4"/><circle cx="1110" cy="83" r="4"/>
+                  <circle cx="1235" cy="106" r="4"/><circle cx="1360" cy="94" r="4"/><circle cx="1485" cy="12" r="4"/>
+                </g>
+                <g fill="#64748b" font-size="12">
+                  <text x="98" y="188">1月</text><text x="223" y="188">2月</text><text x="348" y="188">3月</text>
+                  <text x="473" y="188">4月</text><text x="598" y="188">5月</text><text x="723" y="188">6月</text>
+                  <text x="848" y="188">7月</text><text x="973" y="188">8月</text><text x="1098" y="188">9月</text>
+                  <text x="1217" y="188">10月</text><text x="1340" y="188">11月</text><text x="1463" y="188">12月</text>
+                </g>
+                <g stroke="#335cff" stroke-width="2" stroke-dasharray="6 6">
+                  <line x1="235" y1="26" x2="235" y2="224"/>
+                  <line x1="735" y1="26" x2="735" y2="224"/>
+                  <line x1="860" y1="26" x2="860" y2="224"/>
+                  <line x1="1110" y1="26" x2="1110" y2="224"/>
+                  <line x1="1288" y1="26" x2="1288" y2="224"/>
+                </g>
+                <g fill="#0f172a" font-size="12" font-weight="600">
+                  <text x="202" y="242">寒假</text>
+                  <text x="702" y="242">5.0发布</text>
+                  <text x="838" y="242">暑假</text>
+                  <text x="1058" y="242">开学季活动</text>
+                  <text x="1236" y="242">极光季</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div class="calendar-wrap">
+            <div class="calendar-12">${monthCards}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>策略跟进</h3>
+            </div>
+          </div>
+          <div class="console-summary-grid" style="grid-template-columns: minmax(0, 0.48fr) minmax(0, 1.52fr);">
+            <div class="console-month-block">
+              <div class="console-summary-list">${strategyListHtml}</div>
+            </div>
+            <div class="console-month-block">
+              <div class="console-track-list">${strategyTrackingHtml}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderIssues() {
+      const current = getCurrentMonthData();
+      const example = getPhaseOneExample();
+      const issue = example.issue;
+      const issueCards = `
+        <div class="issue-config-card">
+          <div class="issue-config-head">
+            <div>
+              <div class="strategy-option-top">
+                <span class="issue-order">01</span>
+                <h4>${issue.title}</h4>
+                <span class="tag primary">问题已成立</span>
+              </div>
+            </div>
+            <button class="ghost-btn" onclick="showToast('已打开问题配置示例')">查看配置</button>
+          </div>
+          <div class="library-desc-list">
+            <div class="library-desc-item">
+              <strong>问题定义</strong>
+              <p>${issue.definition}</p>
+            </div>
+            <div class="library-desc-item">
+              <strong>排除条件</strong>
+              <p>${issue.exclusion}</p>
+            </div>
+          </div>
+          <div class="issue-relation-list">
+            ${example.relations.map((relation, relationIndex) => `
+              <div class="issue-relation-item">
+                <div class="strategy-option-top">
+                  <span class="tag neutral">推荐关系 ${relationIndex + 1}</span>
+                  <strong>${relation.strategy}</strong>
+                </div>
+                <div class="issue-relation-grid">
+                  <div class="strategy-brief-item">
+                    <div class="name">门店画像</div>
+                    <div class="value">${relation.applicableProfile}</div>
+                  </div>
+                  <div class="strategy-brief-item">
+                    <div class="name">门店状态</div>
+                    <div class="value">${relation.triggerState}</div>
+                  </div>
+                  <div class="strategy-brief-item">
+                    <div class="name">周期状态</div>
+                    <div class="value">非淡季、非证件季</div>
+                  </div>
+                  <div class="strategy-brief-item">
+                    <div class="name">成立证据</div>
+                    <div class="value">${relation.evidenceSummary}</div>
+                  </div>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+      return `
+        <div class="library-layout">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>问题清单</h3>
+                <p>统一维护问题名称、排除条件与推荐关系。对一期而言，推荐关系中的画像、状态、周期状态即问题成立证据。</p>
+              </div>
+              <div class="top-actions">
+                <span class="chip">当前月份：${current.yearLabel}</span>
+              </div>
+            </div>
+            <div class="issue-config-list">${issueCards}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLibrary() {
+      const current = getCurrentMonthData();
+      const publishedRows = state.published.map(item => `
+        <tr>
+          <td>${item.name}</td>
+          <td>${item.scope}</td>
+          <td>${item.cycle}</td>
+          <td><span class="tag ${statusClass(item.status)}">${item.status}</span></td>
+        </tr>
+      `).join("");
+      const taskRows = state.tasks.map(item => `
+        <tr>
+          <td>${item.store}</td>
+          <td>${item.title}</td>
+          <td>${item.detail}</td>
+          <td>${renderStatus(item.status)}</td>
+        </tr>
+      `).join("");
+      return `
+        <div class="library-layout">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>策略实例</h3>
+                <p>当前页面先保留为策略实例承接页，后续可继续补充实例详情、执行凭证和复盘结论。</p>
+              </div>
+              <div class="top-actions">
+                <span class="chip">当前月份：${current.yearLabel}</span>
+              </div>
+            </div>
+            <div class="console-summary-grid" style="grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);">
+              <div class="console-month-block">
+                <div class="block-title">
+                  <h4>已生成实例</h4>
+                </div>
+                <div class="table-wrap">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>实例名称</th>
+                        <th>范围</th>
+                        <th>周期</th>
+                        <th>状态</th>
+                      </tr>
+                    </thead>
+                    <tbody>${publishedRows}</tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="console-month-block">
+                <div class="block-title">
+                  <h4>页面说明</h4>
+                </div>
+                <div class="library-desc-list">
+                  <div class="library-desc-item">
+                    <strong>当前定位</strong>
+                    <p>先保留策略实例入口，承接总部后续查看实例详情的需求。</p>
+                  </div>
+                  <div class="library-desc-item">
+                    <strong>后续待补</strong>
+                    <p>实例周期、适用门店、参数配置、执行凭证、过程结果、最终结果、复盘结论。</p>
+                  </div>
+                  <div class="library-desc-item">
+                    <strong>本版原则</strong>
+                    <p>先保证中控台主链路清晰，策略实例页保持结构占位，不做过重展开。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>当前任务</h3>
+                <p>展示当前已经下发或待补充反馈的实例任务，便于后续扩成实例详情页。</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>门店</th>
+                    <th>任务</th>
+                    <th>内容</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody>${taskRows}</tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderReview() {
+      return `
+        <div class="metrics">
+          <div class="metric-card">
+            <div class="metric-label">单开放点位产出</div>
+            <div class="metric-value">￥328</div>
+            <div class="metric-trend up">较策略前 +8.9%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">高价值场景占比</div>
+            <div class="metric-value">34.6%</div>
+            <div class="metric-trend up">较策略前 +1.9pct</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">空闲点位损失率</div>
+            <div class="metric-value">12.1%</div>
+            <div class="metric-trend up">较策略前 -1.9pct</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">异常恢复时长</div>
+            <div class="metric-value">2.1天</div>
+            <div class="metric-trend up">较上轮 -0.6天</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>策略前后</h3>
+                <p>核心指标变化</p>
+              </div>
+            </div>
+            <div class="compare-grid">
+              <div class="compare-box">
+                <h4>策略前</h4>
+                <div class="compare-row"><span>单开放点位产出</span><strong>￥301</strong></div>
+                <div class="compare-row"><span>高价值场景占比</span><strong>32.7%</strong></div>
+                <div class="compare-row"><span>空闲点位损失率</span><strong>14.0%</strong></div>
+                <div class="compare-row"><span>周间预约率</span><strong>52.8%</strong></div>
+              </div>
+              <div class="compare-box">
+                <h4>策略后</h4>
+                <div class="compare-row"><span>单开放点位产出</span><strong class="up">￥328</strong></div>
+                <div class="compare-row"><span>高价值场景占比</span><strong class="up">34.6%</strong></div>
+                <div class="compare-row"><span>空闲点位损失率</span><strong class="up">12.1%</strong></div>
+                <div class="compare-row"><span>周间预约率</span><strong class="up">56.3%</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>策略包效果</h3>
+                <p>按策略包看当前结论。</p>
+              </div>
+            </div>
+            <div class="stack">
+              <div class="timeline-card">
+                <div class="package-top">
+                  <h4>低谷托底包</h4>
+                  <span class="tag success">建议扩大</span>
+                </div>
+                <p>周间晚间预约率提升明显，空转损失率下降，适合扩大到同类型门店。</p>
+              </div>
+              <div class="timeline-card">
+                <div class="package-top">
+                  <h4>高价值优先包</h4>
+                  <span class="tag primary">继续执行</span>
+                </div>
+                <p>高价值场景占比改善，但个别门店承接能力仍偏弱，建议继续观察一轮。</p>
+              </div>
+              <div class="timeline-card">
+                <div class="package-top">
+                  <h4>异常干预包</h4>
+                  <span class="tag warning">局部回收</span>
+                </div>
+                <p>异常识别有效，但部分门店问题来自临时外部因素，不适合长期保留。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>门店差异</h3>
+                <p>识别适合复制和需要回退的样本。</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>门店</th>
+                    <th>策略包</th>
+                    <th>结果判断</th>
+                    <th>下一步</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>杭州滨江店</td>
+                    <td>低谷托底包</td>
+                    <td>${renderStatus("效果最好")}</td>
+                    <td>扩大复制</td>
+                  </tr>
+                  <tr>
+                    <td>南京新街口店</td>
+                    <td>高价值优先包</td>
+                    <td>${renderStatus("继续观察")}</td>
+                    <td>保持执行</td>
+                  </tr>
+                  <tr>
+                    <td>苏州中心店</td>
+                    <td>异常干预包</td>
+                    <td>${renderStatus("建议回退")}</td>
+                    <td>退出样本</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>下一轮动作</h3>
+                <p>基于当前结果给出下一轮经营动作。</p>
+              </div>
+            </div>
+            <div class="stack">
+              <div class="timeline-card">
+                <h4>扩大低谷托底包覆盖范围</h4>
+                <p>从 23 家门店扩展到 41 家同类型门店，优先覆盖周间晚间空转高的蓝标店。</p>
+              </div>
+              <div class="timeline-card">
+                <h4>单独优化高价值优先包参数</h4>
+                <p>保留重点门店优先级，但缩小部分供给紧张门店的执行范围。</p>
+              </div>
+              <div class="timeline-card">
+                <h4>回收不适用的异常样本</h4>
+                <p>对受大型活动影响的门店退出当前观察池，避免干扰策略判断。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderStatus(status) {
+      const map = {
+        "执行中": ["dot-success", "tag success"],
+        "已发布": ["dot-primary", "tag primary"],
+        "跟进中": ["dot-warning", "tag warning"],
+        "待执行": ["dot-warning", "tag warning"],
+        "待反馈": ["dot-danger", "tag danger"],
+        "已执行": ["dot-success", "tag success"],
+        "效果最好": ["dot-success", "tag success"],
+        "继续观察": ["dot-warning", "tag warning"],
+        "建议回退": ["dot-danger", "tag danger"]
+      };
+      const current = map[status] || ["dot-success", "tag success"];
+      const dotClass = current[0] === "dot-primary" ? "dot-success" : current[0];
+      return `<span class="tag ${statusClass(status)}"><span class="status-dot ${dotClass}"></span>${status}</span>`;
+    }
+
+    function statusClass(status) {
+      if (["执行中", "已执行", "效果最好"].includes(status)) return "success";
+      if (["待执行", "跟进中", "继续观察"].includes(status)) return "warning";
+      if (["待反馈", "建议回退"].includes(status)) return "danger";
+      return "primary";
+    }
+
+    function trimCapacityPlanningHeader(frame) {
+      try {
+        const doc = frame.contentDocument || frame.contentWindow.document;
+        if (!doc) return;
+        [".top-bar", ".tabs-container"].forEach(selector => {
+          const node = doc.querySelector(selector);
+          if (node) node.style.display = "none";
+        });
+        const mainContent = doc.querySelector(".main-content");
+        if (mainContent) {
+          mainContent.style.paddingTop = "0";
+        }
+      } catch (error) {
+        console.warn("运力统筹子页面顶部裁剪失败", error);
+      }
+    }
+
+    function renderCapacityPlanning() {
+      return `
+        <section class="embed-shell">
+          <iframe
+            class="embed-frame"
+            src="../自动化开点/运力统筹_20260326.html"
+            title="运力统筹"
+            onload="trimCapacityPlanningHeader(this)"
+          ></iframe>
+        </section>
+      `;
+    }
+
+    function switchPage(key) {
+      if (!pages[key]) key = "console";
+      state.currentPage = key;
+      render();
+    }
+
+    function selectMonth(month) {
+      state.selectedMonth = month;
+      state.selectedConsoleStrategyIndex = 0;
+      const strategyFocus = getConsoleStrategyFocus(month, monthData[month]);
+      state.selectedConsoleTrackingWeek = strategyFocus.strategyRows[0]?.completedWeekIndex ?? 0;
+      state.selectedConsoleIssueIndex = 0;
+      state.consoleStoreKeyword = "";
+      state.consoleStoreIssueFilter = "全部";
+      state.consoleStoreStrategyFilter = "全部";
+      state.selectedAlert = 0;
+      render();
+    }
+
+    function selectAlert(index) {
+      state.selectedAlert = index;
+      render();
+    }
+
+    function selectLibraryFilter(type) {
+      state.libraryFilter = type;
+      render();
+    }
+
+    function toggleStrategyFollowup(month, strategyId) {
+      const key = `${month}-${strategyId}`;
+      const current = Object.prototype.hasOwnProperty.call(state.strategyFollowupsOpen, key)
+        ? state.strategyFollowupsOpen[key]
+        : false;
+      state.strategyFollowupsOpen[key] = !current;
+      render();
+    }
+
+    function updateStrategyWeekAction(month, strategyId, week, value) {
+      if (!state.strategyWeekEdits[month]) {
+        state.strategyWeekEdits[month] = {};
+      }
+      if (!state.strategyWeekEdits[month][strategyId]) {
+        state.strategyWeekEdits[month][strategyId] = {};
+      }
+      state.strategyWeekEdits[month][strategyId][week] = value;
+    }
+
+    function executePackage(name) {
+      const pkg = packageMap[name];
+      state.published.unshift({
+        name,
+        scope: pkg.scope,
+        cycle: pkg.cycle,
+        status: "已执行",
+        owner: "总部经营"
+      });
+      showToast(`${name} 已生成执行实例`);
+      syncSidebar();
+      render();
+    }
+
+    function openDrawer(name) {
+      state.drawerPackage = name;
+      const pkg = packageMap[name];
+      document.getElementById("packageName").value = name;
+      document.getElementById("packageScope").value = pkg.scope;
+      document.getElementById("packageCycle").value = pkg.cycle;
+      document.getElementById("drawerTitle").textContent = `${name}执行实例配置`;
+      document.getElementById("drawerNote").textContent = pkg.desc;
+      document.getElementById("drawer").classList.add("show");
+      document.getElementById("drawerMask").classList.add("show");
+    }
+
+    function closeDrawer() {
+      document.getElementById("drawer").classList.remove("show");
+      document.getElementById("drawerMask").classList.remove("show");
+    }
+
+    function publishDrawer() {
+      const name = state.drawerPackage;
+      const scope = document.getElementById("packageScope").value;
+      const cycle = document.getElementById("packageCycle").value;
+      state.published.unshift({
+        name,
+        scope,
+        cycle,
+        status: "已执行",
+        owner: "总部经营"
+      });
+      closeDrawer();
+      syncSidebar();
+      render();
+      showToast(`${name} 已按新参数生成执行实例`);
+    }
+
+    function updateTask(id, status) {
+      state.tasks = state.tasks.map(item => item.id === id ? { ...item, status } : item);
+      render();
+      showToast(`门店任务状态已更新为${status}`);
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      toast.textContent = text;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+
+    function syncSidebar() {
+      return;
+    }
+
+    function render() {
+      const page = pages[state.currentPage];
+      try {
+        document.getElementById("workspace").innerHTML = page.render();
+      } catch (error) {
+        console.error(error);
+        document.getElementById("workspace").innerHTML = `
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3>页面加载失败</h3>
+                <p>当前页面渲染异常，请刷新后重试；若仍异常，可继续查看控制台报错信息。</p>
+              </div>
+            </div>
+            <div class="library-desc-list">
+              <div class="library-desc-item">
+                <strong>错误信息</strong>
+                <p>${error.message}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      renderNav();
+      syncSidebar();
+    }
+
+    render();
+  </script>
+</body>
+</html>
